@@ -3,6 +3,7 @@
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 . $DIR/scripts/parse_args.sh
+. $DIR/scripts/parallel_utils.sh
 
 if ! [ -d "$OUT_DIR" ] || ! mkdir -p "$OUT_DIR"
 then
@@ -25,6 +26,7 @@ fi
 SPADES_OUTPUT_ROOT=$SCRATCH_DIR/spades
 
 # FASTQs are only read once - no need to stage to scratch if not already there
+# but if the ARE there, reading them will be faster than Isilon
 if ls $SCRATCH_DIR/Fastq/*.fastq.gz &> /dev/null
 then
 	FASTQ_DIR=$SCRATCH_DIR/Fastq
@@ -37,15 +39,19 @@ else
 fi
 
 SAMPLES=$(ls $FASTQ_DIR/*.fastq.gz | cut -f1 -d_ | sort -u | grep -v Undetermined)
-echo "Processing samples $SAMPLES"
 for sample in $SAMPLES
 do
-	if ! $DIR/assemble_sample $SPADES_OUTPUT_ROOT/$sample $(find $FASTQ_DIR -name "$sample*fastq.gz" -print)
-	then
-		echo "Error assembling sample $sample"
-		exit 1
-	fi
+	echo "Processing sample $sample"
+	$DIR/assemble_sample $SPADES_OUTPUT_ROOT/$sample $(find $FASTQ_DIR -name "$sample*fastq.gz" -print) -t 4 -m 32 &
+	jobs="$jobs $!"
+	wait_until_jobs_below 3
 done
+
+if ! wait_until_all_complete $jobs
+then
+	echo "Error assembling one or more samples"
+	exit 1
+fi
 
 if ! [ -z "$JOB_ID" ]
 then
@@ -56,9 +62,8 @@ then
 		exit 1
 	fi
 else
-	echo "Running without local scratch"
+# no local scratch - move results (for speed) and soft link (for access)
 	mv $SPADES_OUTPUT_ROOT $OUT_DIR/spades
 	ln -s $OUT_DIR/spades $SPADES_OUTPUT_ROOT 
-	ln -s $TARGET_RUN_DIR
 fi
 
