@@ -1,0 +1,46 @@
+#!/bin/bash
+
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+# arguments:
+# output dir
+# fastq files
+
+OUT_DIR=$1
+
+if [ -z "$OUT_DIR" ] || [ $# -lt 3 ]
+then
+	echo "Usage: $0 output_dir fastq files"
+	exit 1
+fi
+
+if [ -d "$OUT_DIR" ]
+then
+	echo "$OUT_DIR exists - please remove it"
+	exit 1
+fi
+
+if ! mkdir -p "$OUT_DIR"
+then
+	echo "unable to create $OUT_DIR"
+	exit 1
+fi
+
+OUT_DIR=$(readlink -e $OUT_DIR)
+
+PATH=/illumina/thirdparty/spades/SPAdes-3.1.1-Linux/bin:$PATH
+if [[ "$2" =~ .*_R1_.* ]]
+then
+	FQ_READ_1=$2
+	FQ_READ_2=$3
+else
+	FQ_READ_2=$2
+	FQ_READ_1=$3
+fi
+
+shift 3
+
+if ! spades.py -t 16 -m 64 -o "$OUT_DIR" --hqmp1-1 "$FQ_READ_1" --hqmp1-2 "$FQ_READ_2" --hqmp1-ff --careful $*
+then
+	echo "Assembly failed"
+	exit 1
+fi

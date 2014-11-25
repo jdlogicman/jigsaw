@@ -1,0 +1,88 @@
+#!/bin/bash
+
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+. $DIR/scripts/parse_args.sh
+if [ -z "$RUN_DIR" ] 
+then
+	usage
+fi
+
+if ! [ -f $RUN_DIR/SampleSheet.csv ]
+then
+	echo "Missing sample sheet!"
+	usage
+fi
+
+if ! mkdir -p "$SCRATCH_DIR"
+then
+	echo "Unable to create scratch dir: $SCRATCH_DIR"
+	usage
+fi
+
+if ls $OUT_DIR/Fastq/*.fastq.gz 1> /dev/null 2>&1
+then
+	echo "Fastqs already exist! Please remove them before proceeding"
+	exit 1
+fi
+
+LOCAL_RUN_DIR=$SCRATCH_DIR/run
+LOCAL_FASTQ_DIR=$SCRATCH_DIR/Fastq
+
+if ! [ -z "$JOB_ID" ]
+then
+	# Running as an SGE_JOB
+	if ! rsync -avpP "$RUN_DIR" $LOCAL_RUN_DIR
+	then
+		echo "Error syncing run folder to scratch"
+		exit 1
+	fi
+	SYNC_BACK="rsync -avpP $LOCAL_FASTQ_DIR $OUT_DIR/Fastq"
+else
+	echo "Running without local scratch"
+	ln -s $(readlink -e $RUN_DIR) $LOCAL_RUN_DIR
+	SYNC_BACK="mv $LOCAL_FASTQ_DIR $OUT_DIR/Fastq && ln -s $OUT_DIR/Fastq $LOCAL_FASTQ_DIR"
+fi
+
+# rewrite the sample sheet
+# TODO: guarantee the right adapters, reverse complement, etc are present
+cd $LOCAL_RUN_DIR
+if [ -f SampleSheet.csv ] 
+then
+	cp SampleSheet.csv SampleSheet.csv.$$
+fi
+TMPFILE=SCRATCH_DIR/sstmp.$$
+cp SampleSheet.csv $TMPFILE
+while read line
+	if echo $line | grep -Ei "^Workflow"
+	then
+		echo "Workflow,GenerateFastq"
+	fi
+do
+done < $TMPFILE > SampleSheet.csv
+rm -f $TMPFILE
+
+# run Isis to generate FASTQ files
+exit_status=0
+if ! /illumina/development/Isis/latest/Isis -r $LOCAL_RUN_DIR  -a $LOCAL_FASTQ_DIR
+then
+	echo "Generating Fastq files failed"
+	exit_status=1
+	rm -rf $LOCAL_FASTQ_DIR
+fi
+# sync back results in all cases
+$SYNC_BACK 
+# TODO
+exit $exit_status
+
+if $CLEANUP_SCRATCH
+then
+	rm -rf $LOCAL_FASTQ_DIR
+fi
+rm -rf $LOCAL_RUN_DIR
+
+#exit $exit_status
+
+
+
+
