@@ -8,6 +8,7 @@
 
 usage() { echo "Usage: $0 -r run_dir -o output_directory [-s scratch_root]" 1>&2; exit 1; }
 
+
 if [ -z "$SCRATCH_DIR" ]
 then
 	SCRATCH_ROOT=/scratch

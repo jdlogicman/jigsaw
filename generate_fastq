@@ -3,6 +3,8 @@
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 . $DIR/scripts/parse_args.sh
+. $DIR/scripts/samplesheet.sh
+
 if [ -z "$RUN_DIR" ] 
 then
 	usage
@@ -32,6 +34,7 @@ LOCAL_FASTQ_DIR=$SCRATCH_DIR/Fastq
 if ! [ -z "$JOB_ID" ]
 then
 	# Running as an SGE_JOB
+	echo "Copying run to $LOCAL_RUN_DIR"
 	if ! rsync -avpP "$RUN_DIR" $LOCAL_RUN_DIR
 	then
 		echo "Error syncing run folder to scratch"
@@ -45,22 +48,12 @@ else
 fi
 
 # rewrite the sample sheet
-# TODO: guarantee the right adapters, reverse complement, etc are present
 cd $LOCAL_RUN_DIR
 if [ -f SampleSheet.csv ] 
 then
 	cp SampleSheet.csv SampleSheet.csv.$$
 fi
-TMPFILE=SCRATCH_DIR/sstmp.$$
-cp SampleSheet.csv $TMPFILE
-while read line
-	if echo $line | grep -Ei "^Workflow"
-	then
-		echo "Workflow,GenerateFastq"
-	fi
-do
-done < $TMPFILE > SampleSheet.csv
-rm -f $TMPFILE
+rewrite_samplesheet SampleSheet.csv
 
 # run Isis to generate FASTQ files
 exit_status=0
