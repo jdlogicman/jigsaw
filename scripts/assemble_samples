@@ -1,7 +1,6 @@
 #!/bin/bash
 
-DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
 . $DIR/scripts/parse_args.sh
 . $DIR/scripts/parallel_utils.sh
 
@@ -27,12 +26,12 @@ SPADES_OUTPUT_ROOT=$SCRATCH_DIR/spades
 
 # FASTQs are only read once - no need to stage to scratch if not already there
 # but if the ARE there, reading them will be faster than Isilon
-if ls $SCRATCH_DIR/Fastq/*.fastq.gz &> /dev/null
+if ls $SCRATCH_DIR/Fastq/Fastq/*.fastq.gz &> /dev/null
 then
-	FASTQ_DIR=$SCRATCH_DIR/Fastq
-elif ls $OUT_DIR/Fastq/*.fastq.gz &> /dev/null
+	FASTQ_DIR=$SCRATCH_DIR/Fastq/Fastq
+elif ls $OUT_DIR/Fastq/Fastq/*.fastq.gz &> /dev/null
 then
-	FASTQ_DIR=$OUT_DIR/Fastq
+	FASTQ_DIR=$OUT_DIR/Fastq/Fastq
 else
 	echo "No FASTQ files found"
 	exit 1
@@ -56,9 +55,9 @@ fi
 if ! [ -z "$JOB_ID" ]
 then
 	# Running as an SGE_JOB
-	if ! rsync -avpP $SPADES_OUTPUT_ROOT $OUT_DIR/spades
+	if ! rsync -avpP $SPADES_OUTPUT_ROOT/ $OUT_DIR/spades
 	then
-		echo "Error syncing spades results to to output"
+		echo "Error syncing spades results to output"
 		exit 1
 	fi
 else

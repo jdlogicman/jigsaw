@@ -18,7 +18,7 @@ then
 	while getopts "r:o:s:" o; do
 		case "${o}" in
 			r)
-				export RUN_DIR=${OPTARG}
+				export RUN_DIR=$(readlink -e ${OPTARG})
 				;;
 			o)
 				export OUT_DIR=${OPTARG}
@@ -42,12 +42,18 @@ then
 		echo "Unable to make output directory"
 		usage
 	fi
-	OUT_DIR=$(readlink -e $OUT_DIR)
+	# make absolute path in case someone changes the directory
+	export OUT_DIR=$(readlink -e $OUT_DIR)
 
 
 	if ! [ -z "$JOB_ID" ]
 	then
-		export SCRATCH_DIR=$SCRATCH_ROOT/$JOB_DIR
+		export SCRATCH_DIR=$(echo $SCRATCH_ROOT/${JOB_ID}*)
+		if ! [ -d $SCRATCH_DIR ]
+		then
+			echo "Error: Unable to find SGE scratch directory under $SCRATCH_ROOT"
+			exit 1
+		fi
 	else
 		export SCRATCH_DIR=$OUT_DIR/_scratch
 	fi 

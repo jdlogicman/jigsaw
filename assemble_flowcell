@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if ! [ -z "$JOB_ID" ]
+then
+	echo "This script cannot be used via qsub"
+	exit 1
+fi
+
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 . $DIR/scripts/parse_args.sh
@@ -9,16 +15,12 @@ then
 	echo "Unable to make output directory"
 	usage
 fi
-
-if ! mkdir -p "$SCRATCH_DIR"
+if ! [ -f "$RUN_DIR/SampleSheet.csv" ]
 then
-	echo "Unable to create scratch dir: $SCRATCH_DIR"
+	echo "Run directory or sample sheet do not exist"
 	usage
 fi
 
-
-$DIR/generate_fastq -r "$RUN_DIR" -o "$OUT_DIR" && \
-	$DIR/assemble_samples -r "$RUN_DIR" -o "$OUT_DIR" 
-	#&& \
-	#$DIR/generate_metrics -r "$RUN_DIR" -o "$OUT_DIR" 
-rm -rf $SCRATCH_DIR
+echo $DIR/scripts/assemble_flowcell -r "$RUN_DIR" -o "$OUT_DIR" -s "$SCRATCH_ROOT" | \
+	qsub -pe threaded 16 -l 'h_vmem=96G' -cwd -N assemble_flowcell -e assemble_flowcell.err \
+	-o assemble_flowcell.out -m es -M $USER@illumina.com
