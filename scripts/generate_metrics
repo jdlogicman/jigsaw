@@ -1,0 +1,47 @@
+#!/bin/bash
+
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
+. $DIR/scripts/parse_args.sh
+# arguments
+# standard ones
+# assembly directory
+# genome
+
+if [ -z "$OUT_DIR" ] || [ $# -lt 2 ]
+then
+	echo "Usage: $0 -r run -o output spades_assembly genome_path"
+	exit 1
+fi
+
+if ! mkdir -p "$OUT_DIR"
+then
+	echo "unable to create $OUT_DIR"
+	exit 1
+fi
+
+PATH=/illumina/thirdparty/quast-2.3:$PATH
+
+ASSEMBLY=$1
+GENOME=$2
+
+if ! [ -f "$ASSEMBLY/scaffolds.fasta" ]
+then
+	echo "$ASSEMBLY does not contain a SPAdes assembly"
+	exit 1
+fi
+
+if [[ ! -f "$GENOME" || ! $GENOME =~ .*\.fa ]]
+then
+	echo "$GENOME must be the full path to a .fa file"
+	exit 1
+fi
+
+
+shift 2
+
+
+if ! quast.py --debug -o "$OUT_DIR" -R "$GENOME" "$ASSEMBLY/scaffolds.fasta"
+then
+	echo "Quast failed"
+	exit 1
+fi
