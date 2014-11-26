@@ -64,8 +64,6 @@ then
 fi
 # sync back results in all cases
 eval $SYNC_BACK 
-# TODO
-exit $exit_status
 
 if $CLEANUP_SCRATCH
 then
@@ -73,7 +71,7 @@ then
 fi
 rm -rf $LOCAL_RUN_DIR
 
-#exit $exit_status
+exit $exit_status
 
 
 
