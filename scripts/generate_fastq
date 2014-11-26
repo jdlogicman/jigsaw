@@ -4,31 +4,25 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
 . $DIR/scripts/parse_args.sh
 . $DIR/scripts/samplesheet.sh
 
-if [ -z "$RUN_DIR" ] 
-then
-	usage
-fi
-
-if ! [ -f $RUN_DIR/SampleSheet.csv ]
-then
-	echo "Missing sample sheet!"
-	usage
-fi
-
 if ! mkdir -p "$SCRATCH_DIR"
 then
 	echo "Unable to create scratch dir: $SCRATCH_DIR"
 	usage
 fi
 
-if ls $OUT_DIR/Fastq/Fastq/*.fastq.gz 1> /dev/null 2>&1
-then
-	echo "Fastqs already exist! Please remove them before proceeding"
-	exit 1
-fi
-
 LOCAL_RUN_DIR=$SCRATCH_DIR/run
 LOCAL_FASTQ_DIR=$SCRATCH_DIR/Fastq
+
+if ls $OUT_DIR/Fastq/Fastq/*.fastq.gz 1> /dev/null 2>&1
+then
+	#TODO
+#echo "Fastqs already exist! Please remove them before proceeding"
+	#exit 1
+	echo "Fastqs exist - skipping"
+	ln -s $OUT_DIR/Fastq $LOCAL_FASTQ_DIR
+	exit 0
+fi
+
 
 if ! [ -z "$JOB_ID" ]
 then
@@ -64,13 +58,6 @@ then
 fi
 # sync back results in all cases
 eval $SYNC_BACK 
-
-#TODO
-#if $CLEANUP_SCRATCH
-#then
-	#rm -rf $LOCAL_FASTQ_DIR
-#fi
-rm -rf $LOCAL_RUN_DIR
 
 exit $exit_status
 

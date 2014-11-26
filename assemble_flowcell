@@ -22,5 +22,5 @@ then
 fi
 
 echo $DIR/scripts/assemble_flowcell -r "$RUN_DIR" -o "$OUT_DIR" -s "$SCRATCH_ROOT" | \
-	qsub -pe threaded 16 -l 'h_vmem=96G' -cwd -N assemble_flowcell -e assemble_flowcell.err \
-	-o assemble_flowcell.out -m es -M $USER@illumina.com
+	qsub -pe threaded 16 -l 'h_vmem=96G' -cwd -N assemble_flowcell -e $OUT_DIR/assemble_flowcell.err \
+	-o $OUT_DIR/assemble_flowcell.out -m es -M $USER@illumina.com

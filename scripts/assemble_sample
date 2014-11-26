@@ -1,21 +1,14 @@
 #!/bin/bash
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
+. $DIR/scripts/parse_args.sh
 # arguments:
-# output dir
+# standard ones
 # fastq files
 
-OUT_DIR=$1
-
-if [ -z "$OUT_DIR" ] || [ $# -lt 3 ]
+if [ -z "$OUT_DIR" ] || [ $# -lt 2 ]
 then
-	echo "Usage: $0 output_dir fastq files"
-	exit 1
-fi
-
-if [ -d "$OUT_DIR" ]
-then
-	echo "$OUT_DIR exists - please remove it"
+	echo "Usage: $0 output_dir fastq files spades_args"
 	exit 1
 fi
 
@@ -25,21 +18,19 @@ then
 	exit 1
 fi
 
-OUT_DIR=$(readlink -e $OUT_DIR)
-
 PATH=/illumina/thirdparty/spades/SPAdes-3.1.1-Linux/bin:$PATH
-if [[ "$2" =~ .*_R1_.* ]]
+if [[ "$1" =~ .*_R1_.* ]]
 then
-	FQ_READ_1=$2
-	FQ_READ_2=$3
-else
+	FQ_READ_1=$1
 	FQ_READ_2=$2
-	FQ_READ_1=$3
+else
+	FQ_READ_2=$1
+	FQ_READ_1=$2
 fi
 
-shift 3
+shift 2
 
-if ! spades.py  -o "$OUT_DIR" --hqmp1-1 "$FQ_READ_1" --hqmp1-2 "$FQ_READ_2" --hqmp1-ff --careful $*
+if ! spades.py  $* -o "$OUT_DIR" --hqmp1-1 "$FQ_READ_1" --hqmp1-2 "$FQ_READ_2" --hqmp1-ff --careful
 then
 	echo "Assembly failed"
 	exit 1

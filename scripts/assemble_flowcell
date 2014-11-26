@@ -3,7 +3,7 @@
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
 . $DIR/scripts/parse_args.sh
 
-if ! [ -d "$OUT_DIR" ] || ! mkdir -p "$OUT_DIR"
+if ! [ -d "$OUT_DIR" ] && ! mkdir -p "$OUT_DIR"
 then
 	echo "Unable to make output directory"
 	usage
@@ -16,8 +16,8 @@ then
 fi
 
 
-$DIR/scripts/generate_fastq -r "$RUN_DIR" -o "$OUT_DIR" && \
-	$DIR/scripts/assemble_samples -r "$RUN_DIR" -o "$OUT_DIR" 
+$DIR/scripts/generate_fastq -r "$RUN_DIR" -o "$OUT_DIR" -s "$SCRATCH_ROOT" && \
+	$DIR/scripts/assemble_samples -r "$RUN_DIR" -o "$OUT_DIR" -s "$SCRATCH_ROOT"  
 	#&& \
 	#$DIR/generate_metrics -r "$RUN_DIR" -o "$OUT_DIR" 
-#rm -rf $SCRATCH_DIR
+rm -rf $SCRATCH_DIR
