@@ -37,19 +37,21 @@ else
 	exit 1
 fi
 
-SAMPLES=$(ls $FASTQ_DIR/*.fastq.gz | cut -f1 -d_ | sort -u | grep -v Undetermined)
+SAMPLES=$(cd $FASTQ_DIR && ls *.fastq.gz | cut -f1 -d_ | sort -u | grep -v Undetermined)
 for sample in $SAMPLES
 do
 	echo "Processing sample $sample"
-	$DIR/assemble_sample $SPADES_OUTPUT_ROOT/$sample $(find $FASTQ_DIR -name "$sample*fastq.gz" -print) -t 4 -m 32 &
+	$DIR/scripts/assemble_sample $SPADES_OUTPUT_ROOT/$sample $(find $FASTQ_DIR -name "$sample*fastq.gz" -print) -t 4 -m 32 &
 	jobs="$jobs $!"
 	wait_until_jobs_below 3
 done
 
+failed=false
+
 if ! wait_until_all_complete $jobs
 then
+	failed=true
 	echo "Error assembling one or more samples"
-	exit 1
 fi
 
 if ! [ -z "$JOB_ID" ]
@@ -65,4 +67,7 @@ else
 	mv $SPADES_OUTPUT_ROOT $OUT_DIR/spades
 	ln -s $OUT_DIR/spades $SPADES_OUTPUT_ROOT 
 fi
-
+if $failed
+then
+	exit 1
+fi

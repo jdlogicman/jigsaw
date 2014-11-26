@@ -16,9 +16,8 @@ then
 fi
 
 
-$DIR/scripts/generate_fastq -r "$RUN_DIR" -o "$OUT_DIR" 
-#&& \
-#$DIR/scripts/assemble_samples -r "$RUN_DIR" -o "$OUT_DIR" 
+$DIR/scripts/generate_fastq -r "$RUN_DIR" -o "$OUT_DIR" && \
+	$DIR/scripts/assemble_samples -r "$RUN_DIR" -o "$OUT_DIR" 
 	#&& \
 	#$DIR/generate_metrics -r "$RUN_DIR" -o "$OUT_DIR" 
 #rm -rf $SCRATCH_DIR

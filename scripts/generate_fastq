@@ -65,10 +65,11 @@ fi
 # sync back results in all cases
 eval $SYNC_BACK 
 
-if $CLEANUP_SCRATCH
-then
-	rm -rf $LOCAL_FASTQ_DIR
-fi
+#TODO
+#if $CLEANUP_SCRATCH
+#then
+	#rm -rf $LOCAL_FASTQ_DIR
+#fi
 rm -rf $LOCAL_RUN_DIR
 
 exit $exit_status
