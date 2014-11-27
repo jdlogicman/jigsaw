@@ -41,7 +41,6 @@ Adapter,CTGTCTCTTATACACATCT+AGATGTGTATAAGAGACAG+GATCGGAAGAGCACACGTCTGAACTCCAGTCA
 
 get_sample_genome()
 {
-	echo $*
 	local sample_sheet=$1
 	local sample=$2
 	local sample_line=$(grep -i $sample $sample_sheet | tr "," "\n" | grep -i WholeGenome | head -1 | tr '\\' '/')

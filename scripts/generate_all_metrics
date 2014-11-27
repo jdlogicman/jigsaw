@@ -38,6 +38,7 @@ for sample in $SAMPLES
 do
 	echo "Processing sample $sample"
 	GENOME=$(get_sample_genome $RUN_DIR/SampleSheet.csv $sample)
+	echo "Sample: $sample, genome: $GENOME"
 	if ! $DIR/scripts/generate_metrics -r "$RUN_DIR" -o "$OUT_DIR/quast/$sample" $SPADES_OUTPUT_ROOT/$sample $GENOME
 	then
 		echo "Error generating metrics for $sample"

@@ -16,6 +16,14 @@ then
 	usage
 fi
 
+# JED - TODO
+if [ -d $OUT_DIR/spades ]
+then
+	echo "$OUT_DIR/spades already exists. KEEPING IT!"
+	exit 0
+fi
+
+
 if [ -d $OUT_DIR/spades ]
 then
 	echo "$OUT_DIR/spades already exists. Please remove it"
