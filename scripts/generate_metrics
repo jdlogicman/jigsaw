@@ -19,7 +19,6 @@ then
 	exit 1
 fi
 
-PATH=/illumina/thirdparty/quast-2.3:$PATH
 
 ASSEMBLY=$1
 GENOME=$2
@@ -38,6 +37,8 @@ fi
 
 
 shift 2
+export PATH=/illumina/thirdparty/quast-2.3:/illumina/thirdparty/python/python-2.7.8/bin:$PATH
+export PYTHONPATH=/illumina/thirdparty/python/python_libraries/packages:$PYTHONPATH
 
 
 if ! quast.py --debug -o "$OUT_DIR" -R "$GENOME" "$ASSEMBLY/scaffolds.fasta"

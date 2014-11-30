@@ -43,7 +43,7 @@ get_sample_genome()
 {
 	local sample_sheet=$1
 	local sample=$2
-	local sample_line=$(grep -i $sample $sample_sheet | tr "," "\n" | grep -i WholeGenome | head -1 | tr '\\' '/')
+	local sample_line=$(grep -i $sample $sample_sheet | tr "," "\n" | grep -i WholeGenome | head -1 | tr '\\' '/' | sed 's/FASTA/Fasta/g')
 	if ! [ -z "$sample_line" ]
 	then
 		if [ -f $sample_line/genome.fa ]
