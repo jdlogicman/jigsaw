@@ -41,7 +41,7 @@ export PATH=/illumina/thirdparty/quast-2.3:/illumina/thirdparty/python/python-2.
 export PYTHONPATH=/illumina/thirdparty/python/python_libraries/packages:$PYTHONPATH
 
 
-if ! quast.py --debug -o "$OUT_DIR" -R "$GENOME" "$ASSEMBLY/scaffolds.fasta"
+if ! quast.py --debug --scaffolds -o "$OUT_DIR" -R "$GENOME" "$ASSEMBLY/scaffolds.fasta"
 then
 	echo "Quast failed"
 	exit 1

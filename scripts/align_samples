@@ -1,0 +1,65 @@
+#!/bin/bash 
+
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
+. $DIR/scripts/parse_args.sh
+. $DIR/scripts/samplesheet.sh
+
+if ! mkdir -p "$SCRATCH_DIR"
+then
+	echo "Unable to create scratch dir: $SCRATCH_DIR"
+	usage
+fi
+
+LOCAL_RUN_DIR=$SCRATCH_DIR/run
+LOCAL_ALIGN_DIR=$SCRATCH_DIR/Alignment
+
+if [ -d $OUT_DIR/Alignment ]
+then
+#echo "Alignment already exists! Please remove it before proceeding"
+	#exit 1
+	echo "Alignment exists - skipping"
+	ln -s $OUT_DIR/Alignment $LOCAL_ALIGN_DIR
+	exit 0
+fi
+
+
+if ! [ -z "$JOB_ID" ]
+then
+	# Running as an SGE_JOB
+	echo "Copying run to $LOCAL_RUN_DIR"
+	if ! rsync -avpP "$RUN_DIR/" $LOCAL_RUN_DIR
+	then
+		echo "Error syncing run folder to scratch"
+		exit 1
+	fi
+	SYNC_BACK="rsync -avpP $LOCAL_ALIGN_DIR/ $OUT_DIR/Alignment"
+else
+	echo "Running without local scratch"
+	ln -s $(readlink -e $RUN_DIR) $LOCAL_RUN_DIR
+	SYNC_BACK="mv $LOCAL_ALIGN_DIR $OUT_DIR/Alignment; ln -s $OUT_DIR/Alignment $LOCAL_ALIGN_DIR"
+fi
+
+# rewrite the sample sheet
+cd $LOCAL_RUN_DIR
+if [ -f SampleSheet.csv ] 
+then
+	cp SampleSheet.csv SampleSheet.csv.$$
+fi
+rewrite_samplesheet_for_alignment SampleSheet.csv
+
+# run Isis
+exit_status=0
+if ! /illumina/development/Isis/latest/Isis -r $LOCAL_RUN_DIR  -a $LOCAL_ALIGN_DIR
+then
+	echo "Alignment failed"
+	exit_status=1
+	rm -rf $LOCAL_ALIGN_DIR
+fi
+# sync back results in all cases
+eval $SYNC_BACK 
+
+exit $exit_status
+
+
+
+

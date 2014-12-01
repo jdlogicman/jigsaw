@@ -34,12 +34,12 @@ SPADES_OUTPUT_ROOT=$SCRATCH_DIR/spades
 
 # FASTQs are only read once - no need to stage to scratch if not already there
 # but if the ARE there, reading them will be faster than Isilon
-if ls $SCRATCH_DIR/Fastq/Fastq/*.fastq.gz &> /dev/null
+if ls $SCRATCH_DIR/Alignment/Fastq/*.fastq.gz &> /dev/null
 then
 	FASTQ_DIR=$SCRATCH_DIR/Fastq/Fastq
-elif ls $OUT_DIR/Fastq/Fastq/*.fastq.gz &> /dev/null
+elif ls $OUT_DIR/Alignment/Fastq/*.fastq.gz &> /dev/null
 then
-	FASTQ_DIR=$OUT_DIR/Fastq/Fastq
+	FASTQ_DIR=$OUT_DIR/Alignment/Fastq
 else
 	echo "No FASTQ files found"
 	exit 1

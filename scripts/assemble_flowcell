@@ -16,7 +16,7 @@ then
 fi
 
 
-$DIR/scripts/generate_fastq -r "$RUN_DIR" -o "$OUT_DIR" -s "$SCRATCH_ROOT" && \
+$DIR/scripts/align_samples -r "$RUN_DIR" -o "$OUT_DIR" -s "$SCRATCH_ROOT" && \
 	$DIR/scripts/assemble_samples -r "$RUN_DIR" -o "$OUT_DIR" -s "$SCRATCH_ROOT" && \
 	$DIR/scripts/generate_all_metrics -r "$RUN_DIR" -o "$OUT_DIR" -s "$SCRATCH_ROOT" $OUT_DIR/spades && \
 rm -rf $SCRATCH_DIR

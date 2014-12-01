@@ -39,6 +39,47 @@ Adapter,CTGTCTCTTATACACATCT+AGATGTGTATAAGAGACAG+GATCGGAAGAGCACACGTCTGAACTCCAGTCA
 	rm -f $TMPFILE
 }
 
+rewrite_samplesheet_for_alignment()
+{
+	local SRCDEST=$1
+	TMPFILE=/tmp/sstmp.$$
+
+	shopt -s nocasematch
+	cp $SRCDEST $TMPFILE
+echo "[Header]
+IEMFileVersion,4
+Experiment Name,Jigsaw
+Workflow,Resequencing
+
+[Settings],,,,,,,,
+aligner,bwa
+variantcaller,gatk
+ReverseComplement,1
+Adapter,CTGTCTCTTATACACATCT+AGATGTGTATAAGAGACAG+GATCGGAAGAGCACACGTCTGAACTCCAGTCAC+GATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT
+" > $SRCDEST
+# copy the [Reads] and [Data] sections verbatim
+	local in_section=0
+
+	while read -r line
+	do
+		if [[ $line =~ ^\[.* ]]
+		then
+			# section start
+			if [[ $line =~ ^\[Reads].* || $line =~ ^\[Data].* ]]
+			then
+				in_section=1
+			else
+				in_section=0
+			fi
+		fi
+		if [ $in_section == 1 ]
+		then
+			echo -e "$line" >> $SRCDEST
+		fi
+	done < $TMPFILE
+	rm -f $TMPFILE
+}
+
 get_sample_genome()
 {
 	local sample_sheet=$1
