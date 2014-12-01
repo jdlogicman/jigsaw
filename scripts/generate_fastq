@@ -54,7 +54,6 @@ if ! /illumina/development/Isis/latest/Isis -r $LOCAL_RUN_DIR  -a $LOCAL_FASTQ_D
 then
 	echo "Generating Fastq files failed"
 	exit_status=1
-	rm -rf $LOCAL_FASTQ_DIR
 fi
 # sync back results in all cases
 eval $SYNC_BACK 

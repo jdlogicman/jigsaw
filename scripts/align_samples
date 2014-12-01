@@ -53,7 +53,6 @@ if ! /illumina/development/Isis/latest/Isis -r $LOCAL_RUN_DIR  -a $LOCAL_ALIGN_D
 then
 	echo "Alignment failed"
 	exit_status=1
-	rm -rf $LOCAL_ALIGN_DIR
 fi
 # sync back results in all cases
 eval $SYNC_BACK 
