@@ -1,0 +1,57 @@
+#!/bin/bash
+
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
+. $DIR/scripts/parse_args.sh
+# arguments
+# standard ones
+# BAM file
+# genome
+
+if [ -z "$OUT_DIR" ] || [ $# -lt 2 ]
+then
+	echo "Usage: $0 -r run -o output bam_file genome_path"
+	exit 1
+fi
+
+if ! mkdir -p "$OUT_DIR"
+then
+	echo "unable to create $OUT_DIR"
+	exit 1
+fi
+
+
+BAM_FILE=$1
+GENOME=$2
+
+if [[ ! -f "$BAM_FILE" || ! $BAM_FILE =~ .*\.bam ]]
+then
+	echo "$BAM_FILE must be the full path to a .bam file"
+	exit 1
+fi
+if [[ ! -f "$GENOME" || ! $GENOME =~ .*\.fa ]]
+then
+	echo "$GENOME must be the full path to a .fa file"
+	exit 1
+fi
+
+
+shift 2
+failed=false
+
+# if ! java -Xmx4g -jar /illumina/thirdparty/picard-tools/picard-tools-1.85/CollectMultipleMetrics.jar INPUT=$BAM_FILE OUTPUT=$OUT_DIR/metrics REFERENCE_SEQUENCE=$GENOME PROGRAM=CollectAlignmentSummaryMetrics PROGRAM=CollectInsertSizeMetrics
+if false
+then
+	failed=true
+	echo "Picard failed!"
+fi
+if ! java -Xmx4g -jar /illumina/thirdparty/picard-tools/picard-tools-1.85/CollectGcBiasMetrics.jar INPUT=$BAM_FILE OUTPUT=$OUT_DIR/gc_bias_metrics.txt CHART_OUTPUT=$OUT_DIR/gc_bias_metrics.pdf REFERENCE_SEQUENCE=$GENOME 
+then
+	failed=true
+	echo "Picard failed!"
+fi
+
+
+if $failed
+then
+	exit 1
+fi

@@ -1,0 +1,58 @@
+#!/bin/bash
+
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
+. $DIR/scripts/parse_args.sh
+# arguments
+# standard ones
+# assembly directory
+# genome
+
+if [ -z "$OUT_DIR" ] || [ $# -lt 2 ]
+then
+	echo "Usage: $0 -r run -o output spades_assembly genome_path"
+	exit 1
+fi
+
+if ! mkdir -p "$OUT_DIR"
+then
+	echo "unable to create $OUT_DIR"
+	exit 1
+fi
+
+
+ASSEMBLY=$1
+GENOME=$2
+
+if ! [ -f "$ASSEMBLY/scaffolds.fasta" ]
+then
+	echo "$ASSEMBLY does not contain a SPAdes assembly"
+	exit 1
+fi
+
+if [[ ! -f "$GENOME" || ! $GENOME =~ .*\.fa ]]
+then
+	echo "$GENOME must be the full path to a .fa file"
+	exit 1
+fi
+
+
+shift 2
+
+export PATH=/illumina/thirdparty/last:$PATH
+export PATH=/illumina/thirdparty/python/python-2.7.8/bin:$PATH
+export PYTHONPATH=/illumina/thirdparty/python/python_libraries/packages:$PYTHONPATH
+NEWGENOME=$SCRATCH_DIR/genome.$$
+MYSCRATCH=$SCRATCH_DIR/last.$$
+mkdir -p $MYSCRATCH
+mkdir -p $NEWGENOME
+lastdb -c $NEWGENOME/genome_db $GENOME
+lastal -Q0 $NEWGENOME/genome_db $ASSEMBLY/scaffolds.fasta | last-map-probs.py > $MYSCRATCH/align.maf
+maf-sort.sh $MYSCRATCH/align.maf > $MYSCRATCH/align_sorted.maf
+maf-convert.py sam $MYSCRATCH/align_sorted.maf > $MYSCRATCH/align_sorted.sam
+/illumina/thirdparty/samtools/latest/samtools view -t ${GENOME}.fai -F 0x800 -q 1 -S $MYSCRATCH/align_sorted.sam > $MYSCRATCH/align_sorted_filtered.sam
+/illumina/thirdparty/samtools/latest/samtools view -t ${GENOME}.fai -Sb $MYSCRATCH/align_sorted_filtered.sam > $MYSCRATCH/align_sorted_filtered.bam
+/illumina/thirdparty/samtools/latest/samtools sort $MYSCRATCH/align_sorted_filtered.bam $OUT_DIR/scaffolds
+/illumina/thirdparty/samtools/latest/samtools index $OUT_DIR/scaffolds.bam
+
+rm -rf $MYSCRATCH
+rm -rf $NEWGENOME

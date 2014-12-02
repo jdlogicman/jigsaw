@@ -44,6 +44,16 @@ do
 		echo "Error generating metrics for $sample"
 		failed=true
 	fi
+	if ! $DIR/scripts/generate_picard_metrics -r "$RUN_DIR" -o "$OUT_DIR/picard/$sample" $OUT_DIR/Alignment/$sample*bam $GENOME
+	then
+		echo "Error generating picard metrics for $sample"
+		failed=true
+	fi
+	if ! $DIR/scripts/align_assembly_to_reference -r "$RUN_DIR" -o "$OUT_DIR/last/$sample" $SPADES_OUTPUT_ROOT/$sample $GENOME
+	then
+		echo "Error generating LAST alignment for $sample"
+		failed=true
+	fi
 done
 
 

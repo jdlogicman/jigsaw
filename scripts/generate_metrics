@@ -48,14 +48,6 @@ then
 	failed=true
 fi
 
-BAM_FILE=$(ls $OUT_DIR/Alignment/$ASSEMBLY*bam)
-
-if ! java -Xmx4g -jar /illumina/thirdparty/picard-tools/picard-tools-1.85/CollectMultipleMetrics.jar INPUT=$BAM_FILE OUTPUT=$OUT_DIR/picard/$ASSEMBLY/metrics REFERENCE_SEQUENCE=$GENOME
-then
-	failed=true
-	echo "Picard failed!"
-fi
-
 
 if $failed
 then
