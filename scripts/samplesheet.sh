@@ -53,8 +53,12 @@ Workflow,Resequencing
 
 [Settings],,,,,,,,
 aligner,bwa
-variantcaller,gatk
+variantcaller,None
 ReverseComplement,1
+runcnvdetection,None
+runsvdetection,None
+svannotation,None
+indelrealignment,None
 Adapter,CTGTCTCTTATACACATCT+AGATGTGTATAAGAGACAG+GATCGGAAGAGCACACGTCTGAACTCCAGTCAC+GATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT
 " > $SRCDEST
 # copy the [Reads] and [Data] sections verbatim

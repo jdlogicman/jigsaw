@@ -40,9 +40,24 @@ shift 2
 export PATH=/illumina/thirdparty/quast-2.3:/illumina/thirdparty/python/python-2.7.8/bin:$PATH
 export PYTHONPATH=/illumina/thirdparty/python/python_libraries/packages:$PYTHONPATH
 
+failed=false
 
 if ! quast.py --debug --scaffolds -o "$OUT_DIR" -R "$GENOME" "$ASSEMBLY/scaffolds.fasta"
 then
 	echo "Quast failed"
+	failed=true
+fi
+
+BAM_FILE=$(ls $OUT_DIR/Alignment/$ASSEMBLY*bam)
+
+if ! java -Xmx4g -jar /illumina/thirdparty/picard-tools/picard-tools-1.85/CollectMultipleMetrics.jar INPUT=$BAM_FILE OUTPUT=$OUT_DIR/picard/$ASSEMBLY/metrics REFERENCE_SEQUENCE=$GENOME
+then
+	failed=true
+	echo "Picard failed!"
+fi
+
+
+if $failed
+then
 	exit 1
 fi

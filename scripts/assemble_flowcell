@@ -15,8 +15,28 @@ then
 	usage
 fi
 
+FAILURES=false
 
-$DIR/scripts/align_samples -r "$RUN_DIR" -o "$OUT_DIR" -s "$SCRATCH_ROOT" && \
-	$DIR/scripts/assemble_samples -r "$RUN_DIR" -o "$OUT_DIR" -s "$SCRATCH_ROOT" && \
-	$DIR/scripts/generate_all_metrics -r "$RUN_DIR" -o "$OUT_DIR" -s "$SCRATCH_ROOT" $OUT_DIR/spades && \
+if !  $DIR/scripts/align_samples -r "$RUN_DIR" -o "$OUT_DIR" -s "$SCRATCH_ROOT"
+then
+	echo "align_samples failed!"
+	FAILURES=true
+fi
+
+if ! $DIR/scripts/assemble_samples -r "$RUN_DIR" -o "$OUT_DIR" -s "$SCRATCH_ROOT" 
+then
+	echo "assemble_samples failed!"
+	FAILURES=true
+fi
+if ! $DIR/scripts/generate_all_metrics -r "$RUN_DIR" -o "$OUT_DIR" -s "$SCRATCH_ROOT" $OUT_DIR/spades
+then
+	echo "generate_all_metrics failed!"
+	FAILURES=true
+fi
 rm -rf $SCRATCH_DIR
+
+if $FAILURES
+then
+	echo "FAILURES OCCURRED! Look at the logs and figure out why"
+	exit 1
+fi
