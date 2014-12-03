@@ -23,6 +23,10 @@ fi
 ASSEMBLY=$1
 GENOME=$2
 
+# dot plots
+$DIR/scripts/generate_plot "$GENOME" "$ASSEMBLY/scaffolds.fasta" "$OUT_DIR/dotplot.png"
+
+
 if ! [ -f "$ASSEMBLY/scaffolds.fasta" ]
 then
 	echo "$ASSEMBLY does not contain a SPAdes assembly"
@@ -53,6 +57,9 @@ maf-convert.py sam $MYSCRATCH/align_sorted.maf > $MYSCRATCH/align_sorted.sam
 /illumina/thirdparty/samtools/latest/samtools view -t ${GENOME}.fai -Sb $MYSCRATCH/align_sorted_filtered.sam > $MYSCRATCH/align_sorted_filtered.bam
 /illumina/thirdparty/samtools/latest/samtools sort $MYSCRATCH/align_sorted_filtered.bam $OUT_DIR/scaffolds
 /illumina/thirdparty/samtools/latest/samtools index $OUT_DIR/scaffolds.bam
+
+# create a BED file showing coverage gaps
+/illumina/thirdparty/bedtools/bedtools2-2.20.1/bin/bedtools genomecov -ibam $OUT_DIR/scaffolds.bam -bga -split | grep -E ".*0$" > $OUT_DIR/gaps.bed
 
 rm -rf $MYSCRATCH
 rm -rf $NEWGENOME

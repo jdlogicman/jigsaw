@@ -49,18 +49,10 @@ SAMPLES=$(cd $FASTQ_DIR && ls *.fastq.gz | cut -f1 -d_ | sort -u | grep -v Undet
 for sample in $SAMPLES
 do
 	echo "Processing sample $sample"
-	$DIR/scripts/assemble_sample -r "$RUN_DIR" -o "$SPADES_OUTPUT_ROOT/$sample" $(find $FASTQ_DIR -name "$sample*fastq.gz" -print) -t 4 -m 32 &
-	jobs="$jobs $!"
-	wait_until_jobs_below 3
+	$DIR/scripts/assemble_sample -r "$RUN_DIR" -o "$SPADES_OUTPUT_ROOT/$sample" $(find $FASTQ_DIR -name "$sample*fastq.gz" -print) -t 12 -m 96
 done
 
 failed=false
-
-if ! wait_until_all_complete $jobs
-then
-	failed=true
-	echo "Error assembling one or more samples"
-fi
 
 if ! [ -z "$JOB_ID" ]
 then
