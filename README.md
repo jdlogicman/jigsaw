@@ -5,7 +5,7 @@ These scripts are designed to work on the San Diego and San Francisco clusters.
 
 The tools are installed in /illumina/scratch/Jigsaw/tools/jigsaw.
 
-If you need to make any changes, a pull request is appreciated so I can keep track of things. 
+If you need to make any changes, a pull request is appreciated so I can keep track of things. If you clone your own copy, the pipeline will use the scripts in your source tree, so you can feel safe making related changes to several scripts.
 
 <h2>Usage</h2>
 
