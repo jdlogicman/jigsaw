@@ -38,16 +38,17 @@ fi
 shift 2
 failed=false
 
-# if ! java -Xmx4g -jar /illumina/thirdparty/picard-tools/picard-tools-1.85/CollectMultipleMetrics.jar INPUT=$BAM_FILE OUTPUT=$OUT_DIR/metrics REFERENCE_SEQUENCE=$GENOME PROGRAM=CollectAlignmentSummaryMetrics PROGRAM=CollectInsertSizeMetrics
-if false
+# JED - TODO
+# Picard is crashing AFTER making these metrics
+if ! java -Xmx4g -jar /illumina/thirdparty/picard-tools/picard-tools-1.85/CollectMultipleMetrics.jar INPUT=$BAM_FILE OUTPUT=$OUT_DIR/metrics REFERENCE_SEQUENCE=$GENOME PROGRAM=CollectAlignmentSummaryMetrics PROGRAM=CollectInsertSizeMetrics
 then
-	failed=true
-	echo "Picard failed!"
+	echo "Picard crashed AGAIN"
+	#failed=true
 fi
 if ! java -Xmx4g -jar /illumina/thirdparty/picard-tools/picard-tools-1.85/CollectGcBiasMetrics.jar INPUT=$BAM_FILE OUTPUT=$OUT_DIR/gc_bias_metrics.txt CHART_OUTPUT=$OUT_DIR/gc_bias_metrics.pdf REFERENCE_SEQUENCE=$GENOME 
 then
-	failed=true
-	echo "Picard failed!"
+	#failed=true
+	echo "Picard crashed AGAIN"
 fi
 
 

@@ -30,7 +30,7 @@ fi
 
 shift 2
 
-if ! spades.py  $* -o "$OUT_DIR" --hqmp1-1 "$FQ_READ_1" --hqmp1-2 "$FQ_READ_2" --hqmp1-ff --careful
+if ! spades.py  $* -o "$OUT_DIR" --hqmp1-1 "$FQ_READ_1" --hqmp1-2 "$FQ_READ_2" --hqmp1-fr --careful
 then
 	echo "Assembly failed"
 	exit 1
