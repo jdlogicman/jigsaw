@@ -31,20 +31,20 @@ This is the script submitted to SGE. If you want to run the whole pipeline inter
 <h3>scripts/align_samples</h3>
 Uses Isis/BWA to align the samples to the references provided in the sample sheet. Also creates the FASTQ files with adapters trimmed and reads reverse-complemented.
 
-The results are placed in  _output_/Alignment.
+The results are placed in  <em>output</em>/Alignment.
 
 <h3>scripts/assemble_samples</h3>
-Uses SPAdes 3.3.1 to assemble the FASTQ files. The results are placed in _output_/spades/_SampleID_.
+Uses SPAdes 3.3.1 to assemble the FASTQ files. The results are placed in <em>output</em>/spades/<em>SampleID</em>.
 
 <h3>scripts/generate_all_metrics</h3>
-Uses various tools to create metrics. The following folders are placed in _output_:
+Uses various tools to create metrics. The following folders are placed in <em>output</em>:
 <ul>
-<li>picard/_SampleID_</li>
-<li>quast/_SampleID_</li>
-<li>visualization/_SampleID_</li>
+<li>picard/<em>SampleID</em></li>
+<li>quast/<em>SampleID</em></li>
+<li>visualization/<em>SampleID</em></li>
 </ul>
 
 <h2>Visualizations</h2>
-A file called <pre>summary.html</pre> will appear in the _output_ directory. This will like to the Quast and Isis reports. It will also contain a thunmnail/link to a dot plot of the assembly.
+A file called <pre>summary.html</pre> will appear in the <em>output</em> directory. This will like to the Quast and Isis reports. It will also contain a thunmnail/link to a dot plot of the assembly.
 
 The visualization directory will contain a version of the assembly scaffolds aligned back to the reference genome. It will also contain a BED file called gaps.bed that can be used in IGV to quickly locate regions of the reference not covered by any contigs in the assembly.
