@@ -1,6 +1,8 @@
 #!/bin/bash
 # arguments reference.fasta assembly.fasta output_name
-export PATH=/illumina/thirdparty/quast-2.3/libs/MUMmer3.23-linux:$PATH
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
+. $DIR/scripts/tool_paths.sh
+export PATH=$MUMMER_DIR:$PATH
 TMPDIR=/tmp/plottmp.$$
 mkdir -p $TMPDIR
 pushd $TMPDIR

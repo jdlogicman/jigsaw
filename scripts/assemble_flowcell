@@ -22,6 +22,11 @@ then
 	echo "align_samples failed!"
 	FAILURES=true
 fi
+if !  $DIR/scripts/downsample_fastqs -r "$RUN_DIR" -o "$OUT_DIR" -s "$SCRATCH_ROOT"
+then
+	echo "downsample_fastqs failed!"
+	FAILURES=true
+fi
 
 if ! $DIR/scripts/assemble_samples -r "$RUN_DIR" -o "$OUT_DIR" -s "$SCRATCH_ROOT" 
 then

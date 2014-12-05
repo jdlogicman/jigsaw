@@ -2,6 +2,7 @@
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
 . $DIR/scripts/parse_args.sh
+. $DIR/scripts/tool_paths.sh
 # arguments
 # standard ones
 # assembly directory
@@ -37,8 +38,7 @@ fi
 
 
 shift 2
-export PATH=/illumina/thirdparty/quast-2.3:/illumina/thirdparty/python/python-2.7.8/bin:$PATH
-export PYTHONPATH=/illumina/thirdparty/python/python_libraries/packages:$PYTHONPATH
+export PATH=$QUAST_DIR:$PYTHON_DIR:$PATH
 
 failed=false
 

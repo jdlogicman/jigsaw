@@ -1,0 +1,72 @@
+#!/bin/bash 
+
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
+. $DIR/scripts/parse_args.sh
+. $DIR/scripts/tool_paths.sh
+TARGET_COVERAGE=70
+
+if ! mkdir -p "$SCRATCH_DIR"
+then
+	echo "Unable to create scratch dir: $SCRATCH_DIR"
+	usage
+fi
+
+LOCAL_FASTQ_DIR=$SCRATCH_DIR/Fastq
+
+if [ -d $OUT_DIR/Fastq ]
+then
+#echo "Fastq already exists! Please remove it before proceeding"
+	#exit 1
+	echo "Fastq exists - skipping"
+	ln -s $OUT_DIR/Fastq $LOCAL_FASTQ_DIR
+	exit 0
+fi
+
+mkdir -p "$LOCAL_FASTQ_DIR"
+
+if [ -d $SCRATCH_DIR/Alignment ]
+then
+	LOCAL_ALIGN_DIR=$SCRATCH_DIR/Alignment
+elif [ -d $OUT_DIR/Alignment ]
+then
+	LOCAL_ALIGN_DIR=$OUT_DIR/Alignment
+else
+	echo "No Alignment directory found"
+	exit 1
+fi
+
+
+if ! [ -z "$JOB_ID" ]
+then
+	# no need to sync inputs
+	SYNC_BACK="rsync -avpP $LOCAL_FASTQ_DIR/ $OUT_DIR/Fastq"
+else
+	echo "Running without local scratch"
+	SYNC_BACK="mv $LOCAL_FASTQ_DIR $OUT_DIR/Fastq; ln -s $OUT_DIR/Fastq $LOCAL_FASTQ_DIR"
+fi
+
+. /illumina/development/Isis/UpdateEnvironmentMono 3.2.8 
+
+SAMPLES=$(cd $LOCAL_ALIGN_DIR/Fastq && ls *.fastq.gz | cut -f1 -d_ | sort -u | grep -v Undetermined)
+for sample in $SAMPLES
+do
+	# find the coverage
+	coverage=$(grep "Mean coverage" $LOCAL_ALIGN_DIR/${sample}*summary.csv | cut -f2 -d,)
+	ratio=$(echo "scale=3; $TARGET_COVERAGE / $coverage" | bc)
+	echo "Downsampling $sample to $ratio"
+	mono $FASTQ_SAMPLER_DIR/FastqSampler.exe -i "$LOCAL_ALIGN_DIR/Fastq" -o "$LOCAL_FASTQ_DIR" -n $sample -a $ratio &
+done
+
+wait
+
+echo "Downsampling done. Before:"
+ls -l $LOCAL_ALIGN_DIR/Fastq
+echo "After"
+ls -l $LOCAL_FASTQ_DIR
+	
+# sync back results in all cases
+eval $SYNC_BACK 
+
+
+
+

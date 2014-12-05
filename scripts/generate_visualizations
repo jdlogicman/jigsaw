@@ -2,6 +2,7 @@
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
 . $DIR/scripts/parse_args.sh
+. $DIR/scripts/tool_paths.sh
 # arguments
 # standard ones
 # assembly directory
@@ -42,9 +43,8 @@ fi
 
 shift 2
 
-export PATH=/illumina/thirdparty/last:$PATH
-export PATH=/illumina/thirdparty/python/python-2.7.8/bin:$PATH
-export PYTHONPATH=/illumina/thirdparty/python/python_libraries/packages:$PYTHONPATH
+export PATH=$LAST_DIR:$PATH
+export PATH=$PYTHON_DIR:$PATH
 NEWGENOME=$SCRATCH_DIR/genome.$$
 MYSCRATCH=$SCRATCH_DIR/last.$$
 mkdir -p $MYSCRATCH
@@ -53,13 +53,13 @@ lastdb -c $NEWGENOME/genome_db $GENOME
 lastal -Q0 $NEWGENOME/genome_db $ASSEMBLY/scaffolds.fasta | last-map-probs.py > $MYSCRATCH/align.maf
 maf-sort.sh $MYSCRATCH/align.maf > $MYSCRATCH/align_sorted.maf
 maf-convert.py sam $MYSCRATCH/align_sorted.maf > $MYSCRATCH/align_sorted.sam
-/illumina/thirdparty/samtools/latest/samtools view -t ${GENOME}.fai -F 0x800 -q 1 -S $MYSCRATCH/align_sorted.sam > $MYSCRATCH/align_sorted_filtered.sam
-/illumina/thirdparty/samtools/latest/samtools view -t ${GENOME}.fai -Sb $MYSCRATCH/align_sorted_filtered.sam > $MYSCRATCH/align_sorted_filtered.bam
-/illumina/thirdparty/samtools/latest/samtools sort $MYSCRATCH/align_sorted_filtered.bam $OUT_DIR/scaffolds
-/illumina/thirdparty/samtools/latest/samtools index $OUT_DIR/scaffolds.bam
+$SAMTOOLS_DIR/samtools view -t ${GENOME}.fai -F 0x800 -q 1 -S $MYSCRATCH/align_sorted.sam > $MYSCRATCH/align_sorted_filtered.sam
+$SAMTOOLS_DIR/samtools view -t ${GENOME}.fai -Sb $MYSCRATCH/align_sorted_filtered.sam > $MYSCRATCH/align_sorted_filtered.bam
+$SAMTOOLS_DIR/samtools sort $MYSCRATCH/align_sorted_filtered.bam $OUT_DIR/scaffolds
+$SAMTOOLS_DIR/samtools index $OUT_DIR/scaffolds.bam
 
 # create a BED file showing coverage gaps
-/illumina/thirdparty/bedtools/bedtools2-2.20.1/bin/bedtools genomecov -ibam $OUT_DIR/scaffolds.bam -bga -split | grep -E ".*0$" > $OUT_DIR/gaps.bed
+$BEDTOOLS_DIR/bedtools genomecov -ibam $OUT_DIR/scaffolds.bam -bga -split | grep -E ".*0$" > $OUT_DIR/gaps.bed
 
 rm -rf $MYSCRATCH
 rm -rf $NEWGENOME

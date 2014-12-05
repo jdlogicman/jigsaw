@@ -3,6 +3,7 @@
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
 . $DIR/scripts/parse_args.sh
 . $DIR/scripts/samplesheet.sh
+. $DIR/scripts/tool_paths.sh
 
 if ! mkdir -p "$SCRATCH_DIR"
 then
@@ -41,9 +42,9 @@ fi
 
 # rewrite the sample sheet
 cd $LOCAL_RUN_DIR
-if [ -f SampleSheet.csv ] 
+if ! [ -f SampleSheet.csv.orig ] 
 then
-	cp SampleSheet.csv SampleSheet.csv.$$
+	cp SampleSheet.csv SampleSheet.csv.orig
 fi
 rewrite_samplesheet_for_alignment SampleSheet.csv
 
