@@ -14,6 +14,8 @@ Workflow,GenerateFastq
 
 [Settings],,,,,,,,
 ReverseComplement,1
+Read1EndWithCycle,251
+Read2EndWithCycle,251
 Adapter,CTGTCTCTTATACACATCT+AGATGTGTATAAGAGACAG+GATCGGAAGAGCACACGTCTGAACTCCAGTCAC+GATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT
 " > $SRCDEST
 # copy the [Reads] and [Data] sections verbatim
@@ -55,6 +57,8 @@ Workflow,Resequencing
 aligner,bwa
 variantcaller,None
 ReverseComplement,1
+Read1EndWithCycle,251
+Read2EndWithCycle,251
 runcnvdetection,None
 runsvdetection,None
 svannotation,None
