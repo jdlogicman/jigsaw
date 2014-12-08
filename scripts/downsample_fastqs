@@ -35,11 +35,13 @@ else
 	exit 1
 fi
 
+echo "Using alignment directory $LOCAL_ALIGN_DIR"
+
 
 if ! [ -z "$JOB_ID" ]
 then
 	# no need to sync inputs
-	SYNC_BACK="rsync -avpP $LOCAL_FASTQ_DIR/ $OUT_DIR/Fastq"
+	SYNC_BACK="rsync -avpP $LOCAL_FASTQ_DIR/ $OUT_DIR/Fastq > /dev/null"
 else
 	echo "Running without local scratch"
 	SYNC_BACK="mv $LOCAL_FASTQ_DIR $OUT_DIR/Fastq; ln -s $OUT_DIR/Fastq $LOCAL_FASTQ_DIR"
@@ -53,8 +55,14 @@ do
 	# find the coverage
 	coverage=$(grep "Mean coverage" $LOCAL_ALIGN_DIR/${sample}*summary.csv | cut -f2 -d,)
 	ratio=$(echo "scale=3; $TARGET_COVERAGE / $coverage" | bc)
-	echo "Downsampling $sample to $ratio"
-	mono $FASTQ_SAMPLER_DIR/FastqSampler.exe -i "$LOCAL_ALIGN_DIR/Fastq" -o "$LOCAL_FASTQ_DIR" -n $sample -a $ratio &
+	if [ $(echo "$ratio > 1.0" | bc -l) -eq 1 ]
+	then
+		echo "COPYING fastq files"
+		cp $LOCAL_ALIGN_DIR/Fastq/$sample* $LOCAL_FASTQ_DIR &
+	else
+		echo "Downsampling $sample to $ratio"
+		mono $FASTQ_SAMPLER_DIR/FastqSampler.exe -i "$LOCAL_ALIGN_DIR/Fastq" -o "$LOCAL_FASTQ_DIR" -n $sample -a $ratio &
+	fi
 done
 
 wait

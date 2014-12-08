@@ -28,12 +28,12 @@ if ! [ -z "$JOB_ID" ]
 then
 	# Running as an SGE_JOB
 	echo "Copying run to $LOCAL_RUN_DIR"
-	if ! rsync -avpP "$RUN_DIR/" $LOCAL_RUN_DIR
+	if ! rsync -avpP "$RUN_DIR/" $LOCAL_RUN_DIR > /dev/null
 	then
 		echo "Error syncing run folder to scratch"
 		exit 1
 	fi
-	SYNC_BACK="rsync -avpP $LOCAL_ALIGN_DIR/ $OUT_DIR/Alignment"
+	SYNC_BACK="rsync -avpP $LOCAL_ALIGN_DIR/ $OUT_DIR/Alignment > /dev/null"
 else
 	echo "Running without local scratch"
 	ln -s $(readlink -e $RUN_DIR) $LOCAL_RUN_DIR

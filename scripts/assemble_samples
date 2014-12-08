@@ -65,7 +65,7 @@ fi
 if ! [ -z "$JOB_ID" ]
 then
 	# Running as an SGE_JOB
-	if ! rsync -avpP $SPADES_OUTPUT_ROOT/ $OUT_DIR/spades
+	if ! rsync -avpP $SPADES_OUTPUT_ROOT/ $OUT_DIR/spades > /dev/null
 	then
 		echo "Error syncing spades results to output"
 		exit 1
