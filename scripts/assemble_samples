@@ -40,6 +40,14 @@ then
 elif ls $OUT_DIR/Fastq/*.fastq.gz &> /dev/null
 then
 	FASTQ_DIR=$OUT_DIR/Fastq
+elif ls $SCRATCH_DIR/Alignment/Fastq/*.fastq.gz &> /dev/null
+then
+	# must not be downsampling....
+        FASTQ_DIR=$SCRATCH_DIR/Alignment/Fastq
+elif ls $OUT_DIR/Alignment/Fastq/*.fastq.gz &> /dev/null
+then
+	# must be re-running
+        FASTQ_DIR=$OUT_DIR/Alignment/Fastq
 else
 	echo "No FASTQ files found"
 	exit 1

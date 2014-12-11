@@ -15,25 +15,31 @@ then
 	usage
 fi
 
+
 FAILURES=false
 
-if !  $DIR/scripts/align_samples -r "$RUN_DIR" -o "$OUT_DIR" -s "$SCRATCH_ROOT"
+if !  $DIR/scripts/align_samples ${ALL_ARGS[@]}
 then
 	echo "align_samples failed!"
 	FAILURES=true
 fi
-if !  $DIR/scripts/downsample_fastqs -r "$RUN_DIR" -o "$OUT_DIR" -s "$SCRATCH_ROOT"
+
+if ! [ -z "$DEPTH" ]
 then
-	echo "downsample_fastqs failed!"
-	FAILURES=true
+	if !  $DIR/scripts/downsample_fastqs ${ALL_ARGS[@]}
+	then
+		echo "downsample_fastqs failed!"
+		FAILURES=true
+	fi
 fi
 
-if ! $DIR/scripts/assemble_samples -r "$RUN_DIR" -o "$OUT_DIR" -s "$SCRATCH_ROOT" 
+
+if ! $DIR/scripts/assemble_samples ${ALL_ARGS[@]}
 then
 	echo "assemble_samples failed!"
 	FAILURES=true
 fi
-if ! $DIR/scripts/generate_all_metrics -r "$RUN_DIR" -o "$OUT_DIR" -s "$SCRATCH_ROOT" $OUT_DIR/spades
+if ! $DIR/scripts/generate_all_metrics ${ALL_ARGS[@]} $OUT_DIR/spades
 then
 	echo "generate_all_metrics failed!"
 	FAILURES=true

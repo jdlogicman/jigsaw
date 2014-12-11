@@ -46,7 +46,7 @@ if ! [ -f SampleSheet.csv.orig ]
 then
 	cp SampleSheet.csv SampleSheet.csv.orig
 fi
-rewrite_samplesheet_for_alignment SampleSheet.csv
+rewrite_samplesheet_for_alignment SampleSheet.csv $READLENGTH
 
 # run Isis
 exit_status=0

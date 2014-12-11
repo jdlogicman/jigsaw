@@ -3,7 +3,13 @@
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
 . $DIR/scripts/parse_args.sh
 . $DIR/scripts/tool_paths.sh
-TARGET_COVERAGE=70
+
+if [ -z "$DEPTH" ] 
+then
+	echo "DEPTH is required for this script"
+	exit 1
+fi
+
 
 if ! mkdir -p "$SCRATCH_DIR"
 then
@@ -54,7 +60,7 @@ for sample in $SAMPLES
 do
 	# find the coverage
 	coverage=$(grep "Mean coverage" $LOCAL_ALIGN_DIR/${sample}*summary.csv | cut -f2 -d,)
-	ratio=$(echo "scale=3; $TARGET_COVERAGE / $coverage" | bc)
+	ratio=$(echo "scale=3; $DEPTH / $coverage" | bc)
 	if [ $(echo "$ratio > 1.0" | bc -l) -eq 1 ]
 	then
 		echo "COPYING fastq files"
