@@ -25,6 +25,13 @@ do
 			echo "Error generating summary report for BC"
 			failed=true
 		fi
+	elif [[ $sample =~ ^rs ]]
+	then
+		if ! $DIR/scripts/generate_per_genome_report $GENOME ",rs" $OUT_DIR/.. > $OUT_DIR/../RS.report.html
+		then
+			echo "Error generating summary report for RS"
+			failed=true
+		fi
 	fi
 done
 
