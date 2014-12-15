@@ -1,0 +1,142 @@
+#!/bin/bash
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
+
+# arguments:
+# Genome path (e.g. /illumina/scratch/Jigsaw/genomes/blahblah/NCBI/11-22-1234/Sequence/WholeGenomeFasta)
+# sample regex (e.g. ^BC.*)
+# stats_file
+# the format of the stats_file is specified in regenerate_all_stats
+GENOME=$1
+SAMPLE_LINE_REGEX=$2
+BASE_OUT_DIR=$3
+
+if [ -z "$BASE_OUT_DIR" ]
+then
+	BASE_OUT_DIR=/illumina/scratch/Jigsaw/NMP/Assemblies
+fi
+STATS_FILE=$BASE_OUT_DIR/summary_stats.csv
+
+
+
+if ! [ -f $GENOME/GenomeSize.xml ]
+then
+	echo "Missing GenomeSize.XML file!"
+	exit 1
+fi
+
+genomeAttribute()
+{
+	echo cat $1 | xmllint -shell $GENOME/GenomeSize.xml | grep "=" | cut -f2 -d\"
+}
+
+
+cat << __EOF_HEADER__
+<!DOCTYPE html><html><head><title>Jigsaw Assembly Report</title>
+<head>
+<style>
+	body {
+		color: #333333;
+		font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
+		font-size: 14px;
+		line-height: 20px;
+	}
+	table {
+		border-collapse: separate;
+		border-color: #DDDDDD;
+		border-image: none;
+		border-radius: 4px 4px 4px 4px;
+		border-style: solid solid solid solid;
+		border-width: 1px 1px 1px 1px;
+		border-spacing: 0;
+	}
+	th {
+		background-color: #EEEEEE;
+	}
+	th, td {
+		border: 1px solid #DDDDDD;
+		line-height: 20px;
+		padding: 4px 5px;
+		text-align: left;
+		vertical-align: top;
+	}
+	h1 {
+		color: rgb(255,180,65);
+	}
+	.bs-section-heading {
+		padding-top: 30px;
+	}
+	.bs-subsection-heading {
+		
+	}                                
+	hr {
+		border: 0;
+		height: 1px;
+		background-image: -webkit-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)); 
+		background-image:    -moz-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)); 
+		background-image:     -ms-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)); 
+		background-image:      -o-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)); 
+	}
+	</style>
+</head>
+<body>
+<h1>$(genomeAttribute "/sequenceSizes/@genomeName")</h1>
+<ul>
+	<li>Length: $(genomeAttribute "/sequenceSizes/chromosome/@totalBases" | paste -sd+ | bc)</li>
+	<li>GC Content: x</li>
+</ul>
+<table class="table bs-table">
+<tbody>
+__EOF_HEADER__
+first_line=1
+node_type="th"
+while read line
+do
+	echo "<tr>"
+	shopt -s nocasematch;
+	if [[ $first_line -eq 1 || $line =~ $SAMPLE_LINE_REGEX ]]
+	then
+		OFS=$IFS
+		IFS=","
+		
+		items=($line)
+		IFS=$OFS
+		for column in "${items[@]}"
+		do
+			echo "<${node_type}>${column}</${node_type}>"
+		done
+		if [[ $first_line -eq 0 ]]
+		then
+			# TODO: hack - need to find out sample ID && analysis indexes programmatically
+			analysis=${items[0]}
+			sample=${items[1]}
+			align_report=$(cd $BASE_OUT_DIR && find $analysis/Alignment -name "$sample*report.html")
+			quast_report=$(cd $BASE_OUT_DIR && find $analysis/quast/$sample -name "report.html")
+			dot_plot=$(cd $BASE_OUT_DIR && find $analysis/visualization/$sample -name "dotplot.png")
+			picard=$analysis/picard/$sample
+cat << __EOF_REPORTS__
+			<$node_type>
+			<ul>
+				<li><a href="$align_report">Alignment</a></li>
+				<li><a href="$quast_report">Quast</a></li>
+				<li><a href="$picard">Picard</a></li>
+			</ul>
+			</$node_type>
+			<$node_type>
+				<a href="$dot_plot"><img src="$dot_plot" width="150px" height="150px"/></a>
+			</$node_type>
+__EOF_REPORTS__
+		else
+			# add the custom columns
+			echo "<${node_type}>Reports</${node_type}>"
+			echo "<${node_type}>Plot</${node_type}>"
+		fi
+	fi
+	first_line=0
+	node_type="td"
+	echo "</tr>"
+done < $STATS_FILE
+cat << __EOF_FOOTER__
+</tbody>
+</table>
+</body>
+__EOF_FOOTER__

@@ -1,0 +1,31 @@
+#!/bin/bash
+
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
+. $DIR/scripts/parse_args.sh
+. $DIR/scripts/samplesheet.sh
+
+# arguments:
+
+SAMPLES=$(cd $OUT_DIR/spades && ls)
+for sample in $SAMPLES
+do
+	GENOME=$(dirname $(get_sample_genome $RUN_DIR/SampleSheet.csv $sample))
+	shopt -s nocasematch;
+	if [[ $sample =~ ^ec ]]
+	then
+		if ! $DIR/scripts/generate_per_genome_report $GENOME ",ec" $OUT_DIR/.. > $OUT_DIR/../EC.report.html
+		then
+			echo "Error generating summary report for EC"
+			failed=true
+		fi
+	elif [[ $sample =~ ^bc ]]
+	then
+		if ! $DIR/scripts/generate_per_genome_report $GENOME ",bc" $OUT_DIR/.. > $OUT_DIR/../BC.report.html
+		then
+			echo "Error generating summary report for BC"
+			failed=true
+		fi
+	fi
+done
+
+

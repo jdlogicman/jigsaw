@@ -9,6 +9,8 @@ usage() { echo "Usage: $0 -r run_dir -o output_directory [-s scratch_root] [-d d
 
 
 SCRATCH_ROOT=/scratch
+# need a maximum depth
+DEPTH=140
 
 
 while getopts "r:o:s:d:l:" o; do

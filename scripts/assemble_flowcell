@@ -14,7 +14,8 @@ then
 	echo "Unable to create scratch dir: $SCRATCH_DIR"
 	usage
 fi
-
+echo "READLENGTH=$READLENGTH" > $OUT_DIR/pipeline_params.txt
+echo "DEPTH=$DEPTH" >> $OUT_DIR/pipeline_params.txt
 
 FAILURES=false
 

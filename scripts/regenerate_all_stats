@@ -1,0 +1,15 @@
+#!/bin/bash
+
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
+
+RUN_DIR_BASE=/illumina/scratch/Jigsaw/NMP/NMP_Seq_Runs
+OUT_DIR_BASE=/illumina/scratch/Jigsaw/NMP/Assemblies
+
+echo "Analysis ID,Sample ID,Conditions,#contigs,#misassemblies,Largest Contig,Largest Alignment,NGA50,Best Yet"
+for run in $(cd $RUN_DIR_BASE && ls | grep -E '^1')
+do
+	for analysis in $(cd $OUT_DIR_BASE && ls | grep $run)
+	do
+		$DIR/scripts/generate_analysis_stats -r $RUN_DIR_BASE/$run -o $OUT_DIR_BASE/$analysis
+	done
+done

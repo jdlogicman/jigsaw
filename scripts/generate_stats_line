@@ -1,0 +1,48 @@
+#!/bin/bash
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
+. $DIR/scripts/parse_args.sh
+
+# after the standard arguments:
+# sample ID
+# 
+# Produces a comma-separated list to stdout of:
+# RunID,sample ID,Conditions,#contigs,#misassemblies,Largest Contig,Largest ALignment,NGA50,NO
+
+if ! [ -d "$OUT_DIR/Alignment" ]
+then
+	echo "Missing Alignment directory"
+	exit 1
+fi
+ANALYSIS_ID=$(basename $OUT_DIR)
+SAMPLE_ID=$1
+GENOME_ID=$2
+
+if [ -f "$OUT_DIR/pipeline_params.txt" ]
+then
+	PARAMS=$(cat "$OUT_DIR/pipeline_params.txt" | tr "\n" ";" | tr "," " " | tr '"' "'" | sed 's/;$//g')
+fi
+
+# load all the rows from the summary csv into variables
+summary=$OUT_DIR/Alignment/$SAMPLE_ID*summary.csv
+quast=$OUT_DIR/quast/$SAMPLE_ID/report.tsv
+if [ -f "$summary" ]
+then
+	eval $(tail -n+4 $summary | awk  'BEGIN { FS="," } {gsub(/[[:space:]]/,"", $1); printf "SUMMARY%s=\"%s\"\n",$1,$2 }')
+fi
+if [ -f "$quast" ]
+then
+	eval $(tail -n+1 $quast | awk  'BEGIN { FS="\t" } {gsub(/[ #()>=%\047]/,"", $1); printf "QUAST%s=(\"%s\" \"%s\")\n",$1,$2,$3 }')
+fi
+
+render()
+{
+	echo "$2 ($1)"
+}
+
+LINE="$ANALYSIS_ID,$SAMPLE_ID,$PARAMS,
+$(render ${QUASTcontigs[*]}),
+$(render ${QUASTmisassemblies[*]}),
+$(render ${QUASTLargestcontig[*]}),
+$(render ${QUASTLargestalignment[*]}),
+$(render ${QUASTNGA50[*]}),NO"
+echo ${LINE//$'\n'/}
