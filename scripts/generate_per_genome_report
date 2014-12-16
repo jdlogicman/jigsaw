@@ -3,8 +3,8 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
 
 # arguments:
 # Genome path (e.g. /illumina/scratch/Jigsaw/genomes/blahblah/NCBI/11-22-1234/Sequence/WholeGenomeFasta)
-# sample regex (e.g. ^BC.*)
-# stats_file
+# sample regex (e.g. SAMPLE_ID=EC )
+# Base output directory
 # the format of the stats_file is specified in regenerate_all_stats
 GENOME=$1
 SAMPLE_LINE_REGEX=$2
@@ -15,6 +15,9 @@ then
 	BASE_OUT_DIR=/illumina/scratch/Jigsaw/NMP/Assemblies
 fi
 STATS_FILE=$BASE_OUT_DIR/summary_stats.csv
+
+# kind of a hack to get the genome GC
+ReferenceGC=$(grep -iE $SAMPLE_LINE_REGEX $STATS_FILE | grep QUASTscaffoldReferenceGC | head -1 | tr ',' '\n' | grep QUASTscaffoldReferenceGC | cut -f2 -d=)
 
 
 
@@ -33,12 +36,21 @@ genomeAttribute()
 cat << __EOF_HEADER__
 <!DOCTYPE html><html><head><title>Jigsaw Assembly Report</title>
 <head>
+<script type="text/javascript" src="jquery-latest.js"></script> 
+<script type="text/javascript" src="jquery.tablesorter.min.js"></script> 
+<script>
+\$(document).ready(function() 
+    { 
+        \$(".sortable").tablesorter({sortList: [[0,1]]} ); 
+    } 
+);
+</script>
 <style>
 	body {
 		color: #333333;
 		font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
-		font-size: 14px;
-		line-height: 20px;
+		font-size: 12px;
+		line-height: 14px;
 	}
 	table {
 		border-collapse: separate;
@@ -54,7 +66,7 @@ cat << __EOF_HEADER__
 	}
 	th, td {
 		border: 1px solid #DDDDDD;
-		line-height: 20px;
+		line-height: 14px;
 		padding: 4px 5px;
 		text-align: left;
 		vertical-align: top;
@@ -82,58 +94,74 @@ cat << __EOF_HEADER__
 <h1>$(genomeAttribute "/sequenceSizes/@genomeName")</h1>
 <ul>
 	<li>Length: $(genomeAttribute "/sequenceSizes/chromosome/@totalBases" | paste -sd+ | bc)</li>
-	<li>GC Content: x</li>
+	<li>GC Content: $ReferenceGC</li>
 </ul>
-<table class="table bs-table">
-<tbody>
+<table class="table bs-table sortable">
 __EOF_HEADER__
-first_line=1
-node_type="th"
+declare -A columnMap
+columnMap["ANALYSIS_ID"]="Analysis ID"
+columnMap["SAMPLE_ID"]="Sample ID"
+columnMap["PARAMS"]="Conditions"
+columnMap["QUASTbrokenGenomefraction"]="genome %"
+columnMap["QUASTbrokencontigs"]="#contigs"
+columnMap["QUASTbrokenmisassemblies"]="#misassemblies"
+columnMap["QUASTbrokenLargestalignment"]="Largest Alignment"
+columnMap["PICARDMEAN_INSERT_SIZE"]="Mean Insert Size"
+columnMap["PICARDSTANDARD_DEVIATION"]="Insert StdDev"
+columnMap["QUASTbrokenNGA50"]="NGA50"
+
+orderedHeaders=("ANALYSIS_ID"
+"SAMPLE_ID"
+"PARAMS"
+"QUASTbrokenGenomefraction"
+"QUASTbrokencontigs"
+"QUASTbrokenmisassemblies"
+"QUASTbrokenLargestalignment"
+"QUASTbrokenNGA50"
+"PICARDMEAN_INSERT_SIZE"
+"PICARDSTANDARD_DEVIATION")
+
+echo "<thead>"
+echo "<tr>"
+for K in "${orderedHeaders[@]}" 
+do
+	echo "<th>${columnMap[$K]}</th>"
+done
+echo "<th>Reports</th>"
+echo "</tr>"
+echo "</thead>"
+echo "<tbody>"
+
+shopt -s nocasematch;
+
 while read line
 do
-	echo "<tr>"
-	shopt -s nocasematch;
-	if [[ $first_line -eq 1 || $line =~ $SAMPLE_LINE_REGEX ]]
+	if [[ $line =~ $SAMPLE_LINE_REGEX ]]
 	then
-		OFS=$IFS
-		IFS=","
-		
-		items=($line)
-		IFS=$OFS
-		for column in "${items[@]}"
+		echo "<tr>"
+		# transform the line into variable values in memory
+		eval "$(echo $line | tr "," ";")"
+		for K in "${orderedHeaders[@]}" 
 		do
-			echo "<${node_type}>${column}</${node_type}>"
+			# echo each variable value out. The name of the variable is in $K 
+			echo "<td>${!K}</td>"
 		done
-		if [[ $first_line -eq 0 ]]
-		then
-			# TODO: hack - need to find out sample ID && analysis indexes programmatically
-			analysis=${items[0]}
-			sample=${items[1]}
-			align_report=$(cd $BASE_OUT_DIR && find $analysis/Alignment -name "$sample*report.html")
-			quast_report=$(cd $BASE_OUT_DIR && find $analysis/quast/$sample -name "report.html")
-			dot_plot=$(cd $BASE_OUT_DIR && find $analysis/visualization/$sample -name "dotplot.png")
-			picard=$analysis/picard/$sample
+		align_report=$(cd $BASE_OUT_DIR && find $ANALYSIS_ID/Alignment -name "$SAMPLE_ID*report.html")
+		quast_report=$(cd $BASE_OUT_DIR && find $ANALYSIS_ID/quast/$SAMPLE_ID -name "report.html")
+		dot_plot=$(cd $BASE_OUT_DIR && find $ANALYSIS_ID/visualization/$SAMPLE_ID -name "dotplot.png")
+		picard=$ANALYSIS_ID/picard/$SAMPLE_ID
 cat << __EOF_REPORTS__
-			<$node_type>
-			<ul>
-				<li><a href="$align_report">Alignment</a></li>
-				<li><a href="$quast_report">Quast</a></li>
-				<li><a href="$picard">Picard</a></li>
-			</ul>
-			</$node_type>
-			<$node_type>
-				<a href="$dot_plot"><img src="$dot_plot" width="150px" height="150px"/></a>
-			</$node_type>
+		<td>
+		<ul>
+			<li><a href="$align_report">Alignment</a></li>
+			<li><a href="$quast_report">Quast</a></li>
+			<li><a href="$picard">Picard</a></li>
+			<li><a href="$dotplot">Dot plot</a></li>
+		</ul>
+		</td>
 __EOF_REPORTS__
-		else
-			# add the custom columns
-			echo "<${node_type}>Reports</${node_type}>"
-			echo "<${node_type}>Plot</${node_type}>"
-		fi
+		echo "</tr>"
 	fi
-	first_line=0
-	node_type="td"
-	echo "</tr>"
 done < $STATS_FILE
 cat << __EOF_FOOTER__
 </tbody>

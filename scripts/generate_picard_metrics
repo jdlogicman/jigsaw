@@ -41,12 +41,12 @@ failed=false
 
 # JED - TODO
 # Picard is crashing AFTER making these metrics
-if ! java -Xmx4g -jar $PICARD_DIR/CollectMultipleMetrics.jar INPUT=$BAM_FILE OUTPUT=$OUT_DIR/metrics REFERENCE_SEQUENCE=$GENOME PROGRAM=CollectAlignmentSummaryMetrics PROGRAM=CollectInsertSizeMetrics
+if ! java -d64 -Xmx8g -jar $PICARD_DIR/CollectMultipleMetrics.jar INPUT=$BAM_FILE OUTPUT=$OUT_DIR/metrics REFERENCE_SEQUENCE=$GENOME PROGRAM=CollectAlignmentSummaryMetrics PROGRAM=CollectInsertSizeMetrics
 then
 	echo "Picard crashed AGAIN"
 	#failed=true
 fi
-if ! java -Xmx4g -jar $PICARD_DIR/CollectGcBiasMetrics.jar INPUT=$BAM_FILE OUTPUT=$OUT_DIR/gc_bias_metrics.txt CHART_OUTPUT=$OUT_DIR/gc_bias_metrics.pdf REFERENCE_SEQUENCE=$GENOME 
+if ! java -d64 -Xmx8g -jar $PICARD_DIR/CollectGcBiasMetrics.jar INPUT=$BAM_FILE OUTPUT=$OUT_DIR/gc_bias_metrics.txt CHART_OUTPUT=$OUT_DIR/gc_bias_metrics.pdf REFERENCE_SEQUENCE=$GENOME 
 then
 	#failed=true
 	echo "Picard crashed AGAIN"

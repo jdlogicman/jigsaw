@@ -87,3 +87,11 @@ then
 		export SCRATCH_DIR=$OUT_DIR/_scratch
 	fi 
 fi
+#if [ -z "$JOB_ID" ]
+#then
+	#NAME=$(basename $0)
+	#echo $0 ${ALL_ARGS[@]} | \
+	#qsub -pe threaded 16 -l 'h_vmem=120G' -cwd -N $NAME -e $OUT_DIR/$NAME.err \
+	#-o $OUT_DIR/$NAME.out -m es -M $USER@illumina.com
+	#exit 0
+#fi

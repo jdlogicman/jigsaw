@@ -62,6 +62,11 @@ get_sample_genome()
 	local sample_line=$(grep -i $sample $sample_sheet | tr "," "\n" | grep -i WholeGenome | head -1 | tr '\\' '/' | sed 's/FASTA/Fasta/g')
 	if ! [ -z "$sample_line" ]
 	then
+		# JED - automatically change EColi to new reference
+		if [[ $sample_line =~ 1655/NCBI/2001 ]]
+		then
+			sample_line="Escherichia_coli_K_12_MG1655/NCBI/2013-09-26/Sequence/WholeGenomeFasta"
+		fi
 		if [ -f $sample_line/genome.fa ]
 		then
 			echo $sample_line/genome.fa

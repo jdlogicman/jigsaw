@@ -6,7 +6,7 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
 # sample ID
 # 
 # Produces a comma-separated list to stdout of:
-# RunID,sample ID,Conditions,#contigs,#misassemblies,Largest Contig,Largest ALignment,NGA50,NO
+# analysis ID,sample ID,Conditions,<all quast metrics>,<all alignment metrics>,
 
 if ! [ -d "$OUT_DIR/Alignment" ]
 then
@@ -15,7 +15,6 @@ then
 fi
 ANALYSIS_ID=$(basename $OUT_DIR)
 SAMPLE_ID=$1
-GENOME_ID=$2
 
 if [ -f "$OUT_DIR/pipeline_params.txt" ]
 then
@@ -23,26 +22,31 @@ then
 fi
 
 # load all the rows from the summary csv into variables
-summary=$OUT_DIR/Alignment/$SAMPLE_ID*summary.csv
+summary=$(ls $OUT_DIR/Alignment/$SAMPLE_ID*summary.csv)
 quast=$OUT_DIR/quast/$SAMPLE_ID/report.tsv
+picard=$OUT_DIR/picard/$SAMPLE_ID/metrics.insert_size_metrics
 if [ -f "$summary" ]
 then
 	eval $(tail -n+4 $summary | awk  'BEGIN { FS="," } {gsub(/[[:space:]]/,"", $1); printf "SUMMARY%s=\"%s\"\n",$1,$2 }')
 fi
 if [ -f "$quast" ]
 then
-	eval $(tail -n+1 $quast | awk  'BEGIN { FS="\t" } {gsub(/[ #()>=%\047]/,"", $1); printf "QUAST%s=(\"%s\" \"%s\")\n",$1,$2,$3 }')
+	eval $(tail -n+1 $quast | awk  'BEGIN { FS="\t" } {gsub(/[ #()>=%\047]/,"", $1); printf "QUASTbroken%s=\"%s\"\nQUASTscaffold%s=\"%s\"\n",$1,$2,$1,$3 }')
 fi
 
-render()
-{
-	echo "$2 ($1)"
-}
+if [ -f "$picard" ]
+then
+	headers=($(tail -n+7 $picard | head -1 | tr ' ' '_' | tr '\t' ' '))
+	values=($(tail -n+8 $picard | head -1 | tr '\t' ' '))
+	for i in "${!headers[@]}"
+	do 
+		eval "PICARD${headers[$i]}=${values[$i]}"
+	done
+fi
 
-LINE="$ANALYSIS_ID,$SAMPLE_ID,$PARAMS,
-$(render ${QUASTcontigs[*]}),
-$(render ${QUASTmisassemblies[*]}),
-$(render ${QUASTLargestcontig[*]}),
-$(render ${QUASTLargestalignment[*]}),
-$(render ${QUASTNGA50[*]}),NO"
+
+LINE="ANALYSIS_ID=$ANALYSIS_ID,SAMPLE_ID=$SAMPLE_ID,PARAMS=\"$PARAMS\",
+$(set | grep -E "^QUAST" | tr "\n" "," | sed 's/,$//g'),
+$(set | grep -E "^SUMMARY" | tr "\n" "," | sed 's/,$//g'),
+$(set | grep -E "^PICARD" | tr "\n" "," | sed 's/,$//g')"
 echo ${LINE//$'\n'/}
