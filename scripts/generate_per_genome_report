@@ -158,7 +158,7 @@ cat << __EOF_REPORTS__
 			<li><a href="$align_report">Alignment</a></li>
 			<li><a href="$quast_report">Quast</a></li>
 			<li><a href="$picard">Picard</a></li>
-			<li><a href="$dotplot">Dot plot</a></li>
+			<li><a href="$dot_plot">Dot plot</a></li>
 		</ul>
 		</td>
 __EOF_REPORTS__
