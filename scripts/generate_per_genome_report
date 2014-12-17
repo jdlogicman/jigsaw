@@ -108,6 +108,7 @@ columnMap["QUASTbrokenmisassemblies"]="#misassemblies"
 columnMap["QUASTbrokenLargestalignment"]="Largest Alignment"
 columnMap["PICARDMEAN_INSERT_SIZE"]="Mean Insert Size"
 columnMap["PICARDSTANDARD_DEVIATION"]="Insert StdDev"
+columnMap["PICARD_ALIGNMENTMEAN_READ_LENGTH"]="Mean Read Len"
 columnMap["QUASTbrokenNGA50"]="NGA50"
 
 orderedHeaders=("ANALYSIS_ID"
@@ -119,7 +120,8 @@ orderedHeaders=("ANALYSIS_ID"
 "QUASTbrokenLargestalignment"
 "QUASTbrokenNGA50"
 "PICARDMEAN_INSERT_SIZE"
-"PICARDSTANDARD_DEVIATION")
+"PICARDSTANDARD_DEVIATION"
+"PICARD_ALIGNMENTMEAN_READ_LENGTH")
 
 echo "<thead>"
 echo "<tr>"
