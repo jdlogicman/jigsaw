@@ -23,6 +23,17 @@ then
 	exit 0
 fi
 
+runMaxReads()
+{
+        echo cat '//Read[@Number=1]/@NumCycles' | xmllint -shell $RUN_DIR/RunInfo.xml | grep "=" | cut -f2 -d\"
+}
+RUN_MAX_READS=$(runMaxReads)
+if [[ ! -z "$READLENGTH" && ! -z "$RUN_MAX_READS" && $RUN_MAX_READS -lt $READLENGTH ]]
+then
+	echo "Run read length is less than specified number of reads - cannot truncate"
+	exit 1
+fi
+
 
 if ! [ -z "$JOB_ID" ]
 then
@@ -46,6 +57,8 @@ if ! [ -f SampleSheet.csv.orig ]
 then
 	cp SampleSheet.csv SampleSheet.csv.orig
 fi
+
+
 rewrite_samplesheet_for_alignment SampleSheet.csv $READLENGTH
 
 # run Isis
