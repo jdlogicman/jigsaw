@@ -43,23 +43,15 @@ fi
 
 shift 2
 
-export PATH=$LAST_DIR:$PATH
-export PATH=$PYTHON_DIR:$PATH
-NEWGENOME=$SCRATCH_DIR/genome.$$
-MYSCRATCH=$SCRATCH_DIR/last.$$
+export PATH=$BWA_DIR:$SAMTOOLS_DIR:$PATH
+MYSCRATCH=$SCRATCH_DIR/bwa.$$
 mkdir -p $MYSCRATCH
-mkdir -p $NEWGENOME
-lastdb -c $NEWGENOME/genome_db $GENOME
-lastal -Q0 $NEWGENOME/genome_db $ASSEMBLY/scaffolds.fasta | last-map-probs.py > $MYSCRATCH/align.maf
-maf-sort.sh $MYSCRATCH/align.maf > $MYSCRATCH/align_sorted.maf
-maf-convert.py sam $MYSCRATCH/align_sorted.maf > $MYSCRATCH/align_sorted.sam
-$SAMTOOLS_DIR/samtools view -t ${GENOME}.fai -F 0x800 -q 1 -S $MYSCRATCH/align_sorted.sam > $MYSCRATCH/align_sorted_filtered.sam
-$SAMTOOLS_DIR/samtools view -t ${GENOME}.fai -Sb $MYSCRATCH/align_sorted_filtered.sam > $MYSCRATCH/align_sorted_filtered.bam
-$SAMTOOLS_DIR/samtools sort $MYSCRATCH/align_sorted_filtered.bam $OUT_DIR/scaffolds
-$SAMTOOLS_DIR/samtools index $OUT_DIR/scaffolds.bam
+bwa bwasw -t 4  ${GENOME} $ASSEMBLY/scaffolds.fasta > $MYSCRATCH/scaffolds.sam
+samtools view -bS $MYSCRATCH/scaffolds.sam > $MYSCRATCH/scaffolds.bam
+samtools sort $MYSCRATCH/scaffolds.bam $OUT_DIR/scaffolds
+samtools index $OUT_DIR/scaffolds.bam
 
 # create a BED file showing coverage gaps
 $BEDTOOLS_DIR/bedtools genomecov -ibam $OUT_DIR/scaffolds.bam -bga -split | grep -E ".*0$" > $OUT_DIR/gaps.bed
 
 rm -rf $MYSCRATCH
-rm -rf $NEWGENOME

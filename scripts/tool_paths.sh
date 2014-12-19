@@ -11,3 +11,4 @@ LAST_DIR=/illumina/thirdparty/last
 SAMTOOLS_DIR=/illumina/thirdparty/samtools/latest
 BEDTOOLS_DIR=/illumina/thirdparty/bedtools/bedtools2-2.20.1/bin
 FASTQ_SAMPLER_DIR=/illumina/scratch/Jigsaw/tools/FastqSampler
+BWA_DIR=/illumina/thirdparty/bwa/latest
