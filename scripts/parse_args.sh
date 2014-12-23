@@ -95,3 +95,7 @@ fi
 	#-o $OUT_DIR/$NAME.out -m es -M $USER@illumina.com
 	#exit 0
 #fi
+runMaxReads()
+{
+        echo cat '//Read[@Number=1]/@NumCycles' | xmllint -shell $RUN_DIR/RunInfo.xml | grep "=" | cut -f2 -d\"
+}

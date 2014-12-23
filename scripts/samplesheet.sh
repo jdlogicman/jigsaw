@@ -7,7 +7,10 @@ replace_genome_paths()
 	sed 's/\\/\//g' |  \
 	sed 's/WholeGenomeFASTA/WholeGenomeFasta/g' | \
 	sed 's/Escherichia_coli_K_12_MG1655\/NCBI\/2001-10-15/Escherichia_coli_K_12_MG1655\/NCBI\/2013-09-26/g' |  \
-	sed 's/Rhodobacter_sphaeroides_2.4.1\/NCBI\/2005-10-07/Rhodobacter_sphaeroides_2.4.1\/NCBI\/2012-06-25/g' 
+	sed 's/Rhodobacter_sphaeroides_2.4.1\/NCBI\/2005-10-07/Rhodobacter_sphaeroides_2.4.1\/NCBI\/2012-06-25/g' | \
+	sed 's/,Escherichia_coli_K_12_MG1655/,\/illumina\/scratch\/Jigsaw\/genomes\/Escherichia_coli_K_12_MG1655/g' | \
+	sed 's/,Bacillus_cereus_ATCC_10987/,\/illumina\/scratch\/Jigsaw\/genomes\/Bacillus_cereus_ATCC_10987/g' | \
+	sed 's/,Rhodobacter_sphaeroides_2.4.1/,\/illumina\/scratch\/Jigsaw\/genomes\/Rhodobacter_sphaeroides_2.4.1/g' 
 }
 
 rewrite_samplesheet_for_alignment()
@@ -70,7 +73,7 @@ get_sample_genome()
 {
 	local sample_sheet=$1
 	local sample=$2
-	local sample_line=$(grep -i $sample $sample_sheet | tr "," "\n" | grep -i WholeGenome | head -1 | tr '\\' '/' | sed 's/FASTA/Fasta/g')
+	local sample_line=$(grep -i $sample $sample_sheet | tr "," "\n" | grep -i WholeGenome | head -1 | tr '\\' '/' | sed 's/FASTA/Fasta/g' | tr -d '\r')
 	if ! [ -z "$sample_line" ]
 	then
 		sample_line=$(echo $sample_line | replace_genome_paths)

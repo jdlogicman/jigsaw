@@ -3,7 +3,11 @@
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
 
 RUN_DIR_BASE=/illumina/scratch/Jigsaw/NMP/NMP_Seq_Runs
-OUT_DIR_BASE=/illumina/scratch/Jigsaw/NMP/Assemblies
+OUT_DIR_BASE=$1
+if [ -z "$OUT_DIR_BASE" ]
+then
+	OUT_DIR_BASE=/illumina/scratch/Jigsaw/NMP/Assemblies
+fi
 
 for run in $(cd $RUN_DIR_BASE && ls | grep -E '^1')
 do

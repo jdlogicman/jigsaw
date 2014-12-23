@@ -62,7 +62,7 @@ do
 	coverage=$(grep "Mean coverage" $LOCAL_ALIGN_DIR/${sample}*summary.csv | cut -f2 -d,)
 	ratio=$(echo "scale=3; $DEPTH / $coverage" | bc)
 	echo "Downsample FASTQs: processing $sample - coverage is $coverage, ratio is $ratio"
-	if [ $(echo "$ratio > 1.0" | bc -l) -eq 1 ]
+	if [[ -z "$ratio" || $(echo "$ratio > 1.0" | bc -l) -eq 1 ]]
 	then
 		echo "COPYING fastq files"
 		cp $LOCAL_ALIGN_DIR/Fastq/$sample* $LOCAL_FASTQ_DIR &

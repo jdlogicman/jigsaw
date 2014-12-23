@@ -142,7 +142,7 @@ do
 	then
 		echo "<tr>"
 		# transform the line into variable values in memory
-		eval "$(echo $line | tr "," ";")"
+		eval "$(echo $line | tr "," ";" | sed 's/;;/;/g' )"
 		for K in "${orderedHeaders[@]}" 
 		do
 			# echo each variable value out. The name of the variable is in $K 

@@ -14,7 +14,12 @@ then
 	echo "Unable to create scratch dir: $SCRATCH_DIR"
 	usage
 fi
-echo "READLENGTH=$READLENGTH" > $OUT_DIR/pipeline_params.txt
+if ! [ -z "$READLENGTH" ]
+then
+	echo "READLENGTH=$(runMaxReads)" > $OUT_DIR/pipeline_params.txt
+else
+	echo "READLENGTH=$READLENGTH" > $OUT_DIR/pipeline_params.txt
+fi
 echo "DEPTH=$DEPTH" >> $OUT_DIR/pipeline_params.txt
 
 FAILURES=false

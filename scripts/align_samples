@@ -23,10 +23,6 @@ then
 	exit 0
 fi
 
-runMaxReads()
-{
-        echo cat '//Read[@Number=1]/@NumCycles' | xmllint -shell $RUN_DIR/RunInfo.xml | grep "=" | cut -f2 -d\"
-}
 RUN_MAX_READS=$(runMaxReads)
 if [[ ! -z "$READLENGTH" && ! -z "$RUN_MAX_READS" && $RUN_MAX_READS -lt $READLENGTH ]]
 then
