@@ -45,6 +45,10 @@ Uses various tools to create metrics. The following folders are placed in <em>ou
 </ul>
 
 <h2>Visualizations</h2>
-A file called <pre>summary.html</pre> will appear in the <em>output</em> directory. This will like to the Quast and Isis reports. It will also contain a thunmnail/link to a dot plot of the assembly.
+Files called <pre>EC.report.html</pre>, <pre>BC.report.html</pre>, and <pre>RS.report.html</pre> will appear in the directory above the <em>output</em> directory. These will display per-organism metrics and link out to other reports. 
 
 The visualization directory will contain a version of the assembly scaffolds aligned back to the reference genome. It will also contain a BED file called gaps.bed that can be used in IGV to quickly locate regions of the reference not covered by any contigs in the assembly.
+
+<h2>Genomes</h2>
+The reference genomes we use are under <pre>/illumina/scratch/Jigsaw/genomes</pre>. Only B. Cereus is the same as what is in iGenomes. If you use IGV to inspect the alignments and assemblies, you must use the reference genomes from this location.
+
