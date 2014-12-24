@@ -6,5 +6,5 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
 SAMPLES=$(cd $OUT_DIR; [ -d spades ] && find spades -name scaffolds.fasta | cut -f2 -d/ | sort -u)
 for sample in $SAMPLES
 do
-	$DIR/scripts/generate_stats_line ${ALL_ARGS[@]} $sample
+	$DIR/scripts/generate_stats_line ${ALL_ARGS[@]} $sample >> $OUT_DIR/../summary_stats.csv
 done
