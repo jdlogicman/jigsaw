@@ -1,0 +1,72 @@
+#!/bin/bash
+
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
+. $DIR/scripts/tool_paths.sh
+# arguments
+# gaps.bed file
+# genome directory
+# output directory
+
+GAPS=$(readlink -f $1)
+GENOME=$(readlink -f $2)
+OUT_DIR=$3
+
+
+if ! [ -f $GENOME ]
+then
+	echo "Can't find genome $GENOME"
+	exit 1
+fi
+
+if ! [ -f $GAPS ]
+then
+	echo "Missing gaps file"
+	exit 1
+fi
+
+if [ -z "$OUT_DIR" ] || ! mkdir -p $OUT_DIR
+then
+	echo "Invalid output directory"
+	exit 1
+fi
+
+TMPDIR=/tmp/repeat.$$
+mkdir $TMPDIR
+pushd $TMPDIR > /dev/null
+
+#$DIR/scripts/self-nucmer -maxmatch $GENOME
+#$MUMMER_DIR/show-coords out.delta | tail -n +7 | sort -k 1,1n -k 2,2n | awk -f $DIR/scripts/coords2bed_v2.awk > repeats.bed
+
+$MUMMER_DIR/repeat-match -f $GENOME | tail -n +3 > $TMPDIR/repeats.txt
+awk '{printf "%d\t%d\t%d\n%d\t%d\t%d\n",$1, $1 + $3, $3, $2, $2 + $3, $3}' $TMPDIR/repeats.txt | sort -u | sort -n | awk '{print "chr\t" $0}' > $TMPDIR/repeats_all.bed
+$BEDTOOLS_DIR/bedtools intersect -a $TMPDIR/repeats_all.bed -b $GAPS -u > $OUT_DIR/repeats_gaps.bed
+$BEDTOOLS_DIR/bedtools subtract -a $TMPDIR/repeats_all.bed -b $OUT_DIR/repeats_gaps.bed -A > $OUT_DIR/repeats_nogap.bed
+awk '{print $4}' $OUT_DIR/repeats_nogap.bed | sort -n | uniq -c > $OUT_DIR/nogap_repeat_hist.txt
+awk '{print $4}' $OUT_DIR/repeats_gaps.bed | sort -n | uniq -c > $OUT_DIR/gap_repeat_hist.txt
+popd
+rm -rf $TMPDIR
+minmaxmeanmedian()
+{
+	sort -n | awk '
+		BEGIN { min=99999999999999; max=-1 }
+		{
+			if($1>max) {max=$1};
+			if($1< min) {min=$1};
+			total+=$1; count+=1
+			values[NR] = $1;
+		}
+		END {
+			if (NR % 2) {
+				printf "%d,%d,%d,%d\n", min, max, total/count, values[(NR + 1) / 2];
+			} else {
+				printf "%d,%d,%d,%d\n", min, max, total/count, (values[(NR / 2)] + values[(NR / 2) + 1]) / 2.0;
+			}
+		}'
+}
+
+awk '{print $4}' $OUT_DIR/repeats_gaps.bed | minmaxmeanmedian > $OUT_DIR/minmaxmeanmedian.csv
+
+
+
+
+
