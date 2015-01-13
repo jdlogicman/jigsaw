@@ -26,7 +26,9 @@ summary=$(ls $OUT_DIR/Alignment/$SAMPLE_ID*summary.csv)
 quast=$OUT_DIR/quast/$SAMPLE_ID/report.tsv
 picard=$OUT_DIR/picard/$SAMPLE_ID/metrics.insert_size_metrics
 picard_alignment=$OUT_DIR/picard/$SAMPLE_ID/metrics.alignment_summary_metrics
-echo -n "{ANALYSIS_ID:\"$ANALYSIS_ID\",SAMPLE_ID:\"$SAMPLE_ID\",PARAMS:\"$PARAMS\","
+
+# start rendering Javascript
+echo -n "jigsawresults.push({ANALYSIS_ID:\"$ANALYSIS_ID\",SAMPLE_ID:\"$SAMPLE_ID\",PARAMS:\"$PARAMS\","
 if [ -f "$summary" ]
 then
 	tail -n+4 $summary | awk  'BEGIN { FS="," } {gsub(/[[:space:]]/,"", $1); printf "SUMMARY%s:\"%s\",",$1,$2 }'
@@ -64,6 +66,6 @@ then
 		echo -n "PICARD_ALIGNMENT${headers[$i]}:\"$(roundValue ${values[$i]} 2)\""
 	done
 fi
-echo "},"
+echo "});"
 
 

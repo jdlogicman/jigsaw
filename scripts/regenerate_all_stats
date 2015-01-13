@@ -9,7 +9,7 @@ then
 	OUT_DIR_BASE=/illumina/scratch/Jigsaw/NMP/Assemblies
 fi
 
-echo "jigsawresults = ["
+cat $DIR/summary_stats_base.js
 
 for run in $(cd $RUN_DIR_BASE && ls | grep -E '^1')
 do
@@ -18,4 +18,3 @@ do
 		$DIR/scripts/generate_analysis_stats -r $RUN_DIR_BASE/$run -o $OUT_DIR_BASE/$analysis
 	done
 done
-echo "]"

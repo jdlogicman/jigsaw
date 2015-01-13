@@ -1,0 +1,45 @@
+.ng-table {
+	    border: 1px solid #000;
+}
+body {
+	color: #333333;
+	font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
+	font-size: 12px;
+	line-height: 14px;
+}
+table {
+	border-collapse: separate;
+	border-color: #DDDDDD;
+	border-image: none;
+	border-radius: 4px 4px 4px 4px;
+	border-style: solid solid solid solid;
+	border-width: 1px 1px 1px 1px;
+	border-spacing: 0;
+}
+th {
+	background-color: #EEEEEE;
+}
+th, td {
+	border: 1px solid #DDDDDD;
+	line-height: 14px;
+	padding: 4px 5px;
+	text-align: left;
+	vertical-align: top;
+}
+h1 {
+	color: rgb(255,180,65);
+}
+.bs-section-heading {
+	padding-top: 30px;
+}
+.bs-subsection-heading {
+	
+}                                
+hr {
+	border: 0;
+	height: 1px;
+	background-image: -webkit-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)); 
+	background-image:    -moz-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)); 
+	background-image:     -ms-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)); 
+	background-image:      -o-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)); 
+}

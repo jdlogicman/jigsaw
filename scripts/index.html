@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <script data-require="angular.js@*" data-semver="1.2.0-rc3-nonmin" src="http://code.angularjs.org/1.2.0-rc.3/angular.js"></script>
+    <script data-require="ng-table@*" data-semver="0.3.0" src="http://bazalt-cms.com/assets/ng-table/0.3.0/ng-table.js"></script>
+    
+    <link data-require="ng-table@*" data-semver="0.3.0" rel="stylesheet" href="http://bazalt-cms.com/assets/ng-table/0.3.0/ng-table.css" />
+    <link data-require="bootstrap-css@*" data-semver="3.0.0" rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" />
+    
+    <link rel="stylesheet" href="style.css" />
+	<script type="text/javascript" src="summary_stats.js"></script>
+    <script src="script.js"></script>
+  </head>
+
+<body ng-app="main" ng-controller="DemoCtrl">
+
+    <table ng-table class="table">
+    <tr ng-repeat="result in results">
+		<td data-title="'Analysis ID'">{{result.ANALYSIS_ID}}</td>
+		<td data-title="'Sample ID'">{{result.SAMPLE_ID}}</td>
+		<td data-title="'Conditions'">{{result.PARAMS}}</td>
+		<td data-title="'genome %'">{{result.QUASTbrokenGenomefraction}}</td>
+		<td data-title="'#contigs'">{{result.QUASTbrokencontigs}}</td>
+		<td data-title="'#misassemblies'">{{result.QUASTbrokenmisassemblies}}</td>
+		<td data-title="'Largest Alignment'">{{result.QUASTbrokenLargestalignment}}</td>
+		<td data-title="'Mean Insert Size'">{{result.PICARDMEAN_INSERT_SIZE}}</td>
+		<td data-title="'Insert StdDev'">{{result.PICARDSTANDARD_DEVIATION}}</td>
+		<td data-title="'Mean Read Len'">{{result.PICARD_ALIGNMENTMEAN_READ_LENGTH}}</td>
+		<td data-title="'NGA50'">{{result.QUASTbrokenNGA50}}</td>
+    </tr>
+    </table>
+
+</body>
+</html>
