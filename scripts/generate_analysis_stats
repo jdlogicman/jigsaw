@@ -2,9 +2,9 @@
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
 . $DIR/scripts/parse_args.sh
 
-# Produces a comma-separated list to stdout of the stats for all samples in the analysis that produced an assembly
+# Produces javascript statements to stdout of the stats for all samples in the analysis that produced an assembly
 SAMPLES=$(cd $OUT_DIR; [ -d spades ] && find spades -name scaffolds.fasta | cut -f2 -d/ | sort -u)
 for sample in $SAMPLES
 do
-	$DIR/scripts/generate_stats_line ${ALL_ARGS[@]} $sample >> $OUT_DIR/../summary_stats.csv
+	$DIR/scripts/generate_stats_line ${ALL_ARGS[@]} $sample
 done

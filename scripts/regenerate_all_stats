@@ -8,13 +8,18 @@ if [ -z "$OUT_DIR_BASE" ]
 then
 	OUT_DIR_BASE=/illumina/scratch/Jigsaw/NMP/Assemblies
 fi
+cp $DIR/scripts/summary_stats_base.js $OUT_DIR_BASE/summary_stats.js
 
-cat $DIR/summary_stats_base.js
+
+cp $DIR/scripts/*.html $OUT_DIR_BASE
+cp $DIR/scripts/*.css $OUT_DIR_BASE
+cp $DIR/scripts/script.js $OUT_DIR_BASE
+
 
 for run in $(cd $RUN_DIR_BASE && ls | grep -E '^1')
 do
 	for analysis in $(cd $OUT_DIR_BASE && ls | grep $run)
 	do
-		$DIR/scripts/generate_analysis_stats -r $RUN_DIR_BASE/$run -o $OUT_DIR_BASE/$analysis
+		$DIR/scripts/generate_analysis_stats -r $RUN_DIR_BASE/$run -o $OUT_DIR_BASE/$analysis >> $OUT_DIR_BASE/summary_stats.js
 	done
 done
