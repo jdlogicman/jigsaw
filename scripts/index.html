@@ -14,12 +14,12 @@
   </head>
 
 <body ng-app="main" ng-controller="DemoCtrl">
-	<input type="radio" ng-model="search.SUMMARYReferenceGenome" value="Escherichia" ng-checked="true">E. Coli</input>
-	<input type="radio" ng-model="search.SUMMARYReferenceGenome" value="Bacillus" >B. Cereus</input>
-	<input type="radio" ng-model="search.SUMMARYReferenceGenome" value="Rhodo" >R. Sphaeroides</input>
+	<input type="radio" ng-model="genomeFilter" value="Escherichia">E. Coli</input>
+	<input type="radio" ng-model="genomeFilter" value="Bacillus" >B. Cereus</input>
+	<input type="radio" ng-model="genomeFilter" value="Rhodo" >R. Sphaeroides</input>
 
     <table ng-table="tableParams" class="table">
-    <tr ng-repeat="result in results | filter:search.SUMMARYReferenceGenome">
+    <tr ng-repeat="result in $data | filter:genomeFilter">
 		<td data-title="'Analysis ID'" sortable="'ANALYSIS_ID'">{{result.ANALYSIS_ID}}</td>
 		<td data-title="'Sample ID'" sortable="'SAMPLE_ID'">{{result.SAMPLE_ID}}</td>
 		<td data-title="'Conditions'">{{result.PARAMS}}</td>
