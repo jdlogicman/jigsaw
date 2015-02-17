@@ -14,7 +14,7 @@ then
 	echo "Unable to create scratch dir: $SCRATCH_DIR"
 	usage
 fi
-if ! [ -z "$READLENGTH" ]
+if [ -z "$READLENGTH" ]
 then
 	echo "READLENGTH=$(runMaxReads)" > $OUT_DIR/pipeline_params.txt
 else
