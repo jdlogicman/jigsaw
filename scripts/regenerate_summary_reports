@@ -32,6 +32,41 @@ do
 			echo "Error generating summary report for RS"
 			failed=true
 		fi
+	elif [[ $sample =~ ^sc ]]
+	then
+		if ! $DIR/scripts/generate_per_genome_report $GENOME "SAMPLE_ID=sc" $OUT_DIR/.. > $OUT_DIR/../SC.report.html
+		then
+			echo "Error generating summary report for SC"
+			failed=true
+		fi
+	elif [[ $sample =~ ^mt ]]
+	then
+		if ! $DIR/scripts/generate_per_genome_report $GENOME "SAMPLE_ID=mt" $OUT_DIR/.. > $OUT_DIR/../MT.report.html
+		then
+			echo "Error generating summary report for MT"
+			failed=true
+		fi
+	elif [[ $sample =~ ^bper ]]
+	then
+		if ! $DIR/scripts/generate_per_genome_report $GENOME "SAMPLE_ID=bper" $OUT_DIR/.. > $OUT_DIR/../BP.report.html
+		then
+			echo "Error generating summary report for BP"
+			failed=true
+		fi
+	elif [[ $sample =~ ^bp ]]
+	then
+		if ! $DIR/scripts/generate_per_genome_report $GENOME "SAMPLE_ID=bp[^e]" $OUT_DIR/.. > $OUT_DIR/../BP.report.html
+		then
+			echo "Error generating summary report for BP"
+			failed=true
+		fi
+	elif [[ $sample =~ ^lm ]]
+	then
+		if ! $DIR/scripts/generate_per_genome_report $GENOME "SAMPLE_ID=lm" $OUT_DIR/.. > $OUT_DIR/../LM.report.html
+		then
+			echo "Error generating summary report for LM"
+			failed=true
+		fi
 	fi
 done
 
