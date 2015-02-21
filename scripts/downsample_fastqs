@@ -60,15 +60,17 @@ for sample in $SAMPLES
 do
 	# find the coverage
 	coverage=$(grep "Mean coverage" $LOCAL_ALIGN_DIR/${sample}*summary.csv | cut -f2 -d,)
-	ratio=$(echo "scale=3; $DEPTH / $coverage" | bc)
-	echo "Downsample FASTQs: processing $sample - coverage is $coverage, ratio is $ratio"
-	if [[ -z "$ratio" || $(echo "$ratio > 1.0" | bc -l) -eq 1 ]]
+	pct=$(echo "100 * $DEPTH / $coverage" | bc)
+	echo "Downsample FASTQs: processing $sample - coverage is $coverage, pct is $pct"
+	if [[ -z "$pct" || $pct > 100 ]]
 	then
 		echo "COPYING fastq files"
 		cp $LOCAL_ALIGN_DIR/Fastq/$sample* $LOCAL_FASTQ_DIR &
 	else
-		echo "Downsampling $sample to $ratio"
-		mono $FASTQ_SAMPLER_DIR/FastqSampler.exe -i "$LOCAL_ALIGN_DIR/Fastq" -o "$LOCAL_FASTQ_DIR" -n $sample -a $ratio &
+		echo "Downsampling $sample to $pct pct"
+		R1=$(basename $LOCAL_ALIGN_DIR/Fastq/${sample}*R1*fastq.gz)
+		R2=$(basename $LOCAL_ALIGN_DIR/Fastq/${sample}*R1*fastq.gz)
+		mono $FASTQ_TOOLKIT/FastqToolkit.exe --random --fastq "$LOCAL_ALIGN_DIR/Fastq/$R1" --fastq2 "$LOCAL_ALIGN_DIR/Fastq/$R2" --out "$LOCAL_FASTQ_DIR/$R1" --out2 "$LOCAL_FASTQ_DIR/$R2" --reads-max-p=$pct &
 	fi
 done
 
