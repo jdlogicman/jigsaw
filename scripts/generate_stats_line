@@ -24,8 +24,7 @@ fi
 # load all the rows from the summary csv into variables
 summary=$(ls $OUT_DIR/Alignment/$SAMPLE_ID*summary.csv)
 quast=$OUT_DIR/quast/$SAMPLE_ID/report.tsv
-picard=$OUT_DIR/picard/$SAMPLE_ID/metrics.insert_size_metrics
-picard_alignment=$OUT_DIR/picard/$SAMPLE_ID/metrics.alignment_summary_metrics
+firebrand=$OUT_DIR/firebrand/$SAMPLE_ID/flatOutput.csv
 
 # start rendering Javascript
 echo -n "jigsawresults.push({ANALYSIS_ID:\"$ANALYSIS_ID\",SAMPLE_ID:\"$SAMPLE_ID\",PARAMS:\"$PARAMS\""
@@ -48,22 +47,13 @@ roundValue()
 	fi
 }
 
-if [ -f "$picard" ]
+if [ -f "$firebrand" ]
 then
-	headers=($(tail -n+7 $picard | head -1 | tr ' ' '_' | tr '\t' ' '))
-	values=($(tail -n+8 $picard | head -1 | tr '\t' ' '))
+	headers=($(head -1 $firebrand | tr ' ' '_' | tr ',' ' '))
+	values=($(tail -1 $firebrand | tr ',' ' '))
 	for i in "${!headers[@]}"
 	do 
-		echo -n ",PICARD${headers[$i]}:\"$(roundValue ${values[$i]} 2)\""
-	done
-fi
-if [ -f "$picard_alignment" ]
-then
-	headers=($(tail -n+7 $picard_alignment| head -1 | tr ' ' '_' | tr '\t' ' '))
-	values=($(grep -E ^PAIR $picard_alignment | tr '\t' ' '))
-	for i in "${!headers[@]}"
-	do 
-		echo -n ",PICARD_ALIGNMENT${headers[$i]}:\"$(roundValue ${values[$i]} 2)\""
+		echo -n ",FIREBRAND${headers[$i]}:\"$(roundValue ${values[$i]} 3)\""
 	done
 fi
 echo "});"

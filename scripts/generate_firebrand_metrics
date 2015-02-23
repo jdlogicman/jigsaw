@@ -1,0 +1,51 @@
+#!/bin/bash
+
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
+. $DIR/scripts/parse_args.sh
+. $DIR/scripts/tool_paths.sh
+# arguments
+# standard ones
+# BAM file
+# genome
+
+if [ -z "$OUT_DIR" ] || [ $# -lt 2 ]
+then
+	echo "Usage: $0 -r run -o output bam_file genome_path"
+	exit 1
+fi
+
+if ! mkdir -p "$OUT_DIR"
+then
+	echo "unable to create $OUT_DIR"
+	exit 1
+fi
+
+
+BAM_FILE=$1
+GENOME=$2
+
+if [[ ! -f "$BAM_FILE" || ! $BAM_FILE =~ .*\.bam ]]
+then
+	echo "$BAM_FILE must be the full path to a .bam file"
+	exit 1
+fi
+if [[ ! -f "$GENOME" || ! $GENOME =~ .*\.fa ]]
+then
+	echo "$GENOME must be the full path to a .fa file"
+	exit 1
+fi
+OLDIFS=$IFS
+IFS='/' read -a genome_parts <<< "$GENOME"
+IFS=$OLDIFS
+GENOME_BUILD=${genome_parts[${#genome_parts[@]} - 4]}
+GENOME_SRC=${genome_parts[${#genome_parts[@]} - 5]}
+GENOME_SPECIES=${genome_parts[${#genome_parts[@]} - 6]}
+
+
+shift 2
+export LD_LIBRARY_PATH=/illumina/thirdparty/gcc/el6/gcc-4.7.3/lib64:$LD_LIBRARY_PATH
+$FIREBRAND_DIR/firebrand -b "$BAM_FILE" --output "$OUT_DIR" -f "$GENOME" \
+	 --species "$GENOME_SPECIES" \
+	 --reference_name "$GENOME_BUILD" \
+	 --reference_source "$GENOME_SRC"
+

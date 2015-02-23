@@ -44,9 +44,9 @@ do
 		echo "Error generating metrics for $sample"
 		failed=true
 	fi
-	if ! $DIR/scripts/generate_picard_metrics -r "$RUN_DIR" -o "$OUT_DIR/picard/$sample" $OUT_DIR/Alignment/$sample*bam $GENOME
+	if ! $DIR/scripts/generate_firebrand_metrics -r "$RUN_DIR" -o "$OUT_DIR/firebrand/$sample" $OUT_DIR/Alignment/$sample*bam $GENOME
 	then
-		echo "Error generating picard metrics for $sample"
+		echo "Error generating Firebrand metrics for $sample"
 		failed=true
 	fi
 	if ! $DIR/scripts/generate_visualizations -r "$RUN_DIR" -o "$OUT_DIR/visualization/$sample" $SPADES_OUTPUT_ROOT/$sample $GENOME

@@ -151,13 +151,13 @@ do
 		align_report=$(cd $BASE_OUT_DIR && find $ANALYSIS_ID/Alignment -name "$SAMPLE_ID*report.html")
 		quast_report=$(cd $BASE_OUT_DIR && find $ANALYSIS_ID/quast/$SAMPLE_ID -name "report.html")
 		dot_plot=$(cd $BASE_OUT_DIR && find $ANALYSIS_ID/visualization/$SAMPLE_ID -name "dotplot.png")
-		picard=$ANALYSIS_ID/picard/$SAMPLE_ID
+		firebrand=$ANALYSIS_ID/firebrand/$SAMPLE_ID
 cat << __EOF_REPORTS__
 		<td>
 		<ul>
 			<li><a href="$align_report">Alignment</a></li>
 			<li><a href="$quast_report">Quast</a></li>
-			<li><a href="$picard">Picard</a></li>
+			<li><a href="$firebrand">Firebrand</a></li>
 			<li><a href="$dot_plot">Dot plot</a></li>
 		</ul>
 		</td>
