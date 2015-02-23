@@ -1,10 +1,26 @@
 var app = angular.module('main', ['ngTable'])
+	.filter('unique', function() {
+	    return function(input, key) {
+	    };
+	})
 	.controller('DemoCtrl', function($scope, $filter, ngTableParams) {
-			// $scope.results = jigsawresults;
-			$scope.genomeFilter='Escherichia';
+			var u = {}, a = [];
+			for(var i = 0, l = jigsawresults.length; i < l; ++i){
+				if(!u.hasOwnProperty(jigsawresults[i].SUMMARYReferenceGenome)) {
+				    a.push(jigsawresults[i].SUMMARYReferenceGenome);
+				    u[jigsawresults[i].SUMMARYReferenceGenome] = 1;
+				}
+			    }
+			$scope.genomes = a;
+			for (var index=0; index < a.length; index++) {
+				if (a[index].indexOf('Esch') == 0) {
+					$scope.genomeFilter = a[index];
+					break;
+				}
+			}
 			$scope.tableParams = new ngTableParams({
 				page: 1,            // show first page
-				count: 10,          // count per page
+				count: 100,          // count per page
 				sorting: {
 				    ANALYSIS_ID: 'desc'     // initial sorting
 				}
@@ -19,6 +35,5 @@ var app = angular.module('main', ['ngTable'])
 				    $defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
 				}
 			    });
-		}
-	);
+		});
 

@@ -2,6 +2,7 @@
 <html>
 
   <head>
+	<title>Jigsaw Summary</title>
     <script data-require="angular.js@*" data-semver="1.2.0-rc3-nonmin" src="http://code.angularjs.org/1.2.0-rc.3/angular.js"></script>
     <script data-require="ng-table@*" data-semver="0.3.1" src="http://bazalt-cms.com/assets/ng-table/0.3.1/ng-table.js"></script>
     
@@ -14,9 +15,12 @@
   </head>
 
 <body ng-app="main" ng-controller="DemoCtrl">
-	<input type="radio" ng-model="genomeFilter" value="Escherichia">E. Coli</input>
-	<input type="radio" ng-model="genomeFilter" value="Bacillus" >B. Cereus</input>
-	<input type="radio" ng-model="genomeFilter" value="Rhodo" >R. Sphaeroides</input>
+	<label data-ng-repeat="result in genomes">
+	<input name="genome" type="radio" ng-model="$parent.genomeFilter" ng-value="result">{{result}}</input>
+	</label>
+<div>
+	<div>{{genomeFilter}}</div>
+</div>
 
     <table ng-table="tableParams" class="table">
     <tr ng-repeat="result in $data | filter:genomeFilter">
