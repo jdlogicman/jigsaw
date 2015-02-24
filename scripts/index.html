@@ -18,9 +18,6 @@
 	<label data-ng-repeat="result in genomes">
 	<input name="genome" type="radio" ng-model="$parent.genomeFilter" ng-value="result">{{result}}</input>
 	</label>
-<div>
-	<div>{{genomeFilter}}</div>
-</div>
 
     <table ng-table="tableParams" class="table">
     <tr ng-repeat="result in $data | filter:genomeFilter">
@@ -35,6 +32,14 @@
 		<td data-title="'Insert StdDev'" sortable="'FIREBRANDinsert_size_stdev'">{{result.FIREBRANDinsert_size_stdev}}</td>
 		<td data-title="'Mean Read Len'" sortable="'FIREBRANDmean_read_length'">{{result.FIREBRANDmean_read_length}}</td>
 		<td data-title="'NGA50'" sortable="'QUASTbrokenNGA50'">{{result.QUASTbrokenNGA50}}</td>
+		<td data-title="'Links'">
+			<ul>
+				<li><a href="{{result.ANALYSIS_ID}}/Alignment">Alignment</a></li>
+				<li><a href="{{result.ANALYSIS_ID}}/quast//{{result.SAMPLE_ID}}/report.html">Quast</a></li>
+				<li><a href="{{result.ANALYSIS_ID}}/firebrand/{{result.SAMPLE_ID}}/report/firebrandReport.html">Firebrand</a></li>
+				<li><a href="{{result.ANALYSIS_ID}}/visualization/{{result.SAMPLE_ID}}/dotplot.png">Dot plot</a></li>
+			</ul>
+		</td>
     </tr>
     </table>
 
