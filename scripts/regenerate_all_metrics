@@ -1,0 +1,20 @@
+#!/bin/bash
+
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
+
+RUN_DIR_BASE=/illumina/scratch/Jigsaw/NMP/NMP_Seq_Runs
+OUT_DIR_BASE=$1
+if [ -z "$OUT_DIR_BASE" ]
+then
+	OUT_DIR_BASE=/illumina/scratch/Jigsaw/NMP/Assemblies
+fi
+
+for run in $(cd $RUN_DIR_BASE && ls | grep -E '^1')
+do
+	for analysis in $(cd $OUT_DIR_BASE && ls | grep $run)
+	do
+		$DIR/scripts/generate_all_metrics -r $RUN_DIR_BASE/$run -o $OUT_DIR_BASE/$analysis >> $OUT_DIR_BASE/summary_stats.js
+	done
+done
+
+$DIR/scripts/regenerate_all_stats $OUT_DIR_BASE

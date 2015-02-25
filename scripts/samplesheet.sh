@@ -90,3 +90,54 @@ get_sample_genome()
 		fi
 	fi
 }
+
+get_sample_field()
+{
+# $1 - sample sheet file name
+# $2 = sample id
+# $3 = field name
+	local sample_sheet=$1
+	local sample_id=$2
+	local field_name=$3
+	local headers
+	local values
+	local in_section=0
+
+	declare -A sample
+
+	shopt -s nocasematch
+	while read -r line
+	do
+		line=$(echo $line | sed -e 's///g')
+		if [ $in_section == 1 ]
+		then
+			if [ -z "${headers[0]}" ]
+			then
+				IFS=',' read -a headers <<< "$line"
+				unset IFS
+			else
+				IFS=',' read -a values <<< "$line"
+				unset IFS
+				for idx in $(seq 0 $(( ${#headers[@]} - 1 )) )
+				do
+					sample[${headers[$idx]}]="${values[$idx]}"
+				done
+				if [[ ${sample["SampleID"]} =~ $sample_id || ${sample["Sample_ID"]} =~ $sample_id ]]
+				then
+					echo "${sample[$field_name]}"
+					return
+				fi
+			fi
+		fi
+		if [[ $line =~ ^\[.* ]]
+		then
+			# section start
+			if [[ $line =~ ^\[Data].* ]]
+			then
+				in_section=1
+			else
+				in_section=0
+			fi
+		fi
+	done < $sample_sheet
+}

@@ -11,9 +11,10 @@ usage() { echo "Usage: $0 -r run_dir -o output_directory [-s scratch_root] [-d d
 SCRATCH_ROOT=/scratch
 # need a maximum depth
 DEPTH=140
+FORCE=false
 
 
-while getopts "r:o:s:d:l:" o; do
+while getopts "r:o:s:d:l:f" o; do
 	case "${o}" in
 		r)
 			RUN_DIR=$(readlink -m ${OPTARG})
@@ -29,6 +30,9 @@ while getopts "r:o:s:d:l:" o; do
 			;;
 		l)
 			READLENGTH=${OPTARG}
+			;;
+		f)
+			FORCE=true
 			;;
 		*)
 			usage

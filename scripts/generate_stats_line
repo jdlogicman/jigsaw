@@ -1,6 +1,7 @@
 #!/bin/bash
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
 . $DIR/scripts/parse_args.sh
+. $DIR/scripts/samplesheet.sh
 
 # after the standard arguments:
 # sample ID
@@ -56,6 +57,8 @@ then
 		echo -n ",FIREBRAND${headers[$i]}:\"$(roundValue ${values[$i]} 3)\""
 	done
 fi
+SampleDesc="$(get_sample_field $RUN_DIR/SampleSheet.csv $SAMPLE_ID Description)"
+echo -n ",SAMPLESHEETDescription:\"$SampleDesc\""
 echo "});"
 
 
