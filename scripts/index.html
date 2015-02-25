@@ -19,44 +19,48 @@
 	<input name="genome" type="radio" ng-model="$parent.genomeFilter" ng-value="result">{{result}}</input>
 	</label>
 <div><button ng-click="showColumnChooser=!showColumnChooser">Select Columns</button>
-	<span ng-show="showColumnChooser">
-    <label class="checkbox" ng-repeat="column in columns">
-        <input type="checkbox" ng-model="column.visible" /> {{column.title}}
-    </label>
+	<span style="display: table;">
+		<span ng-show="showColumnChooser" style="display: table-cell;">
+		    <label class="checkbox" ng-repeat="column in columns">
+			<input type="checkbox" ng-model="column.visible" /> {{column.title}}
+		    </label>
+		</span>
+		<span>
+			<table ng-table="tableParams" class="table" show-filter="true" >
+				<thead>
+					<tr>
+						<th ng-repeat="column in columns" ng-show="column.visible"
+							class="text-center sortable" ng-class="{
+							    'sort-asc': tableParams.isSortBy(column.field, 'asc'),
+							    'sort-desc': tableParams.isSortBy(column.field, 'desc')
+							  }"
+							ng-click="tableParams.sorting(column.field, tableParams.isSortBy(column.field, 'asc') ? 'desc' : 'asc')">
+						{{column.title}}
+					    </th>
+						<th class="text-center">Links
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+				    <tr ng-repeat="result in $data | filter:genomeFilter">
+					<td ng-repeat="column in columns" ng-show="column.visible" sortable="column.field">
+						{{result[column.field]}}
+					</td>
+					<td>
+						<ul>
+							<li><a href="{{result.ANALYSIS_ID}}/Alignment">Alignment</a></li>
+							<li><a href="{{result.ANALYSIS_ID}}/quast//{{result.SAMPLE_ID}}/report.html">Quast</a></li>
+							<li><a href="{{result.ANALYSIS_ID}}/firebrand/{{result.SAMPLE_ID}}/report/firebrandReport.html">Firebrand</a></li>
+							<li><a href="{{result.ANALYSIS_ID}}/visualization/{{result.SAMPLE_ID}}/dotplot.png">Dot plot</a></li>
+						</ul>
+					</td>
+				    </tr>
+				</tbody>
+			</table>
+		</span>
 	</span>
 </div>
 
-	<table ng-table="tableParams" class="table" show-filter="true" ng-hide="showColumnChooser">
-		<thead>
-			<tr>
-				<th ng-repeat="column in columns" ng-show="column.visible"
-					class="text-center sortable" ng-class="{
-					    'sort-asc': tableParams.isSortBy(column.field, 'asc'),
-					    'sort-desc': tableParams.isSortBy(column.field, 'desc')
-					  }"
-					ng-click="tableParams.sorting(column.field, tableParams.isSortBy(column.field, 'asc') ? 'desc' : 'asc')">
-				{{column.title}}
-			    </th>
-				<th class="text-center">Links
-				</th>
-			</tr>
-		</thead>
-		<tbody>
-		    <tr ng-repeat="result in $data | filter:genomeFilter">
-			<td ng-repeat="column in columns" ng-show="column.visible" sortable="column.field">
-				{{result[column.field]}}
-			</td>
-			<td>
-				<ul>
-					<li><a href="{{result.ANALYSIS_ID}}/Alignment">Alignment</a></li>
-					<li><a href="{{result.ANALYSIS_ID}}/quast//{{result.SAMPLE_ID}}/report.html">Quast</a></li>
-					<li><a href="{{result.ANALYSIS_ID}}/firebrand/{{result.SAMPLE_ID}}/report/firebrandReport.html">Firebrand</a></li>
-					<li><a href="{{result.ANALYSIS_ID}}/visualization/{{result.SAMPLE_ID}}/dotplot.png">Dot plot</a></li>
-				</ul>
-			</td>
-		    </tr>
-		</tbody>
-	</table>
 
 </body>
 </html>

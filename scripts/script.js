@@ -26,7 +26,7 @@ var app = angular.module('main', ['ngTable'])
 				{ title: 'genome %', field:'QUASTbrokenGenomefraction', visible: true },
 				{ title: '#contigs', field:'QUASTbrokencontigs', visible: true },
 				{ title: '#misassemblies', field:'QUASTbrokenmisassemblies', visible: true },
-				{ title: 'Largest Alignment', field:'QUASTLargestalignment', visible: true },
+				{ title: 'Largest Alignment', field:'QUASTscaffoldLargestalignment', visible: true },
 				{ title: 'Median Insert Size', field:'FIREBRANDinsert_size_median', visible: true },
 				{ title: 'Insert StdDev', field:'FIREBRANDinsert_size_stdev', visible: true },
 				{ title: 'Mean Read Len', field:'FIREBRANDmean_read_length', visible: true },
@@ -36,7 +36,6 @@ var app = angular.module('main', ['ngTable'])
 			for (var x in $scope.columns) {
 				u[$scope.columns[x].field] = 1;
 			}
-			console.log(u);
 			if (jigsawresults.length > 0) {
 				for (var propertyName in jigsawresults[0]) {
 					if (!u.hasOwnProperty(propertyName)) {
@@ -50,13 +49,13 @@ var app = angular.module('main', ['ngTable'])
 			$scope.genomes = a;
 			$scope.showColumnChooser = false;
 			$scope.tableParams = new ngTableParams({
-				page: 1,            // show first page
-				count: 100,          // count per page
+				count: jigsawresults.length,          // count per page
 				sorting: {
 				    ANALYSIS_ID: 'desc'     // initial sorting
 				}
 			    },{
 				total: jigsawresults.length, // length of $scope.results
+				counts: [],
 				getData: function($defer, params) {
 				    // use build-in angular filter
 				    var orderedData = params.sorting() ?
