@@ -44,7 +44,7 @@ GENOME_SPECIES=${genome_parts[${#genome_parts[@]} - 6]}
 
 shift 2
 export LD_LIBRARY_PATH=/illumina/thirdparty/gcc/el6/gcc-4.7.3/lib64:$LD_LIBRARY_PATH
-$FIREBRAND_DIR/firebrand -b "$BAM_FILE" --output "$OUT_DIR" -f "$GENOME" \
+$FIREBRAND_DIR/firebrand -s -b "$BAM_FILE" --output "$OUT_DIR" -f "$GENOME" \
 	 --species "$GENOME_SPECIES" \
 	 --reference_name "$GENOME_BUILD" \
 	 --reference_source "$GENOME_SRC"
