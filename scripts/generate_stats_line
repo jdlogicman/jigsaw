@@ -29,10 +29,14 @@ firebrand=$OUT_DIR/firebrand/$SAMPLE_ID/flatOutput.csv
 
 # start rendering Javascript
 echo -n "jigsawresults.push({ANALYSIS_ID:\"$ANALYSIS_ID\",SAMPLE_ID:\"$SAMPLE_ID\",PARAMS:\"$PARAMS\""
+SampleDesc="$(get_sample_field $RUN_DIR/SampleSheet.csv $SAMPLE_ID Description)"
+echo -n ",SAMPLESHEETDescription:\"$SampleDesc\""
+
 if [ -f "$summary" ]
 then
 	tail -n+4 $summary | awk  'BEGIN { FS="," } {gsub(/[[:space:]]/,"", $1); printf ",SUMMARY%s:\"%s\"",$1,$2 }'
 fi
+
 if [ -f "$quast" ]
 then
 	tail -n+1 $quast | awk  'BEGIN { FS="\t" } {gsub(/[ #()>=%\047]/,"", $1); printf ",QUASTbroken%s:\"%s\",QUASTscaffold%s:\"%s\"",$1,$2,$1,$3 }'
@@ -57,8 +61,6 @@ then
 		echo -n ",FIREBRAND${headers[$i]}:\"$(roundValue ${values[$i]} 3)\""
 	done
 fi
-SampleDesc="$(get_sample_field $RUN_DIR/SampleSheet.csv $SAMPLE_ID Description)"
-echo -n ",SAMPLESHEETDescription:\"$SampleDesc\""
 echo "});"
 
 
