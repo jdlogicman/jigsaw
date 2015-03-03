@@ -62,7 +62,7 @@ do
 	coverage=$(grep "Mean coverage" $LOCAL_ALIGN_DIR/${sample}*summary.csv | cut -f2 -d,)
 	pct=$(echo "100 * $DEPTH / $coverage" | bc)
 	echo "Downsample FASTQs: processing $sample - coverage is $coverage, pct is $pct"
-	if [[ -z "$pct" || $pct > 100 ]]
+	if [[ -z "$pct" || $pct -gt 100 ]]
 	then
 		echo "COPYING fastq files"
 		cp $LOCAL_ALIGN_DIR/Fastq/$sample* $LOCAL_FASTQ_DIR &
