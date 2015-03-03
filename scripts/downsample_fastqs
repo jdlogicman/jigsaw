@@ -69,7 +69,7 @@ do
 	else
 		echo "Downsampling $sample to $pct pct"
 		R1=$(basename $LOCAL_ALIGN_DIR/Fastq/${sample}*R1*fastq.gz)
-		R2=$(basename $LOCAL_ALIGN_DIR/Fastq/${sample}*R1*fastq.gz)
+		R2=$(basename $LOCAL_ALIGN_DIR/Fastq/${sample}*R2*fastq.gz)
 		mono $FASTQ_TOOLKIT/FastqToolkit.exe --random --fastq "$LOCAL_ALIGN_DIR/Fastq/$R1" --fastq2 "$LOCAL_ALIGN_DIR/Fastq/$R2" --out "$LOCAL_FASTQ_DIR/$R1" --out2 "$LOCAL_FASTQ_DIR/$R2" --reads-max-p=$pct &
 	fi
 done
