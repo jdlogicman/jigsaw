@@ -27,6 +27,31 @@ summary=$(ls $OUT_DIR/Alignment/$SAMPLE_ID*summary.csv)
 quast=$OUT_DIR/quast/$SAMPLE_ID/report.tsv
 firebrand=$OUT_DIR/firebrand/$SAMPLE_ID/flatOutput.csv
 
+# want to quote strings, numbers go unquoted
+renderValue()
+{
+	if [[ $1 =~ ^[0-9]+(\.[0-9]+){0,1}$ ]]
+	then
+		if [[ $1 =~ [0-9]*\.[0-9]{3,} ]]
+		then
+			printf "%.2f" $1
+		else
+			echo $1
+		fi
+	else
+		echo '"'$1'"'
+	fi
+}
+
+transformKeyValues()
+{
+	while read line
+	do
+		IFS=':' read -a array <<< "$line"
+		echo -n ",${array[0]}:$(renderValue ${array[1]})"
+	done
+}
+
 # start rendering Javascript
 echo -n "jigsawresults.push({ANALYSIS_ID:\"$ANALYSIS_ID\",SAMPLE_ID:\"$SAMPLE_ID\",PARAMS:\"$PARAMS\""
 SampleDesc="$(get_sample_field $RUN_DIR/SampleSheet.csv $SAMPLE_ID Description)"
@@ -34,23 +59,14 @@ echo -n ",SAMPLESHEETDescription:\"$SampleDesc\""
 
 if [ -f "$summary" ]
 then
-	tail -n+4 $summary | awk  'BEGIN { FS="," } {gsub(/[[:space:]]/,"", $1); printf ",SUMMARY%s:\"%s\"",$1,$2 }'
+	tail -n+4 $summary | awk  'BEGIN { FS="," } {gsub(/[[:space:]]/,"", $1); printf "SUMMARY%s:%s\n",$1,$2 }' | transformKeyValues 
 fi
 
 if [ -f "$quast" ]
 then
-	tail -n+1 $quast | awk  'BEGIN { FS="\t" } {gsub(/[ #()>=%\047]/,"", $1); printf ",QUASTbroken%s:\"%s\",QUASTscaffold%s:\"%s\"",$1,$2,$1,$3 }'
+	tail -n+1 $quast | awk  'BEGIN { FS="\t" } {gsub(/[ #()>=%\047]/,"", $1); printf "QUASTbroken%s:%s\nQUASTscaffold%s:%s\n",$1,$2,$1,$3 }' | transformKeyValues 
 fi
 
-roundValue()
-{
-	if [[ $1 =~ [0-9]*\.[0-9]{3,} ]]
-	then
-		printf "%.2f" $1
-	else
-		echo $1
-	fi
-}
 
 if [ -f "$firebrand" ]
 then
@@ -58,8 +74,8 @@ then
 	values=($(tail -1 $firebrand | tr ',' ' '))
 	for i in "${!headers[@]}"
 	do 
-		echo -n ",FIREBRAND${headers[$i]}:\"$(roundValue ${values[$i]} 3)\""
-	done
+		echo "FIREBRAND${headers[$i]}:${values[$i]}"
+	done | transformKeyValues 
 fi
 echo "});"
 
