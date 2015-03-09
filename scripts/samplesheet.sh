@@ -6,7 +6,7 @@ replace_genome_paths()
 # output - stdout
 	sed 's/\\/\//g' |  \
 	sed 's/WholeGenomeFASTA/WholeGenomeFasta/g' | \
-	sed 's/Escherichia_coli_K_12_MG1655\/NCBI\/2001-10-15/Escherichia_coli_K_12_MG1655\/NCBI\/2013-09-26/g' |  \
+	sed 's/Escherichia_coli_K_12_MG1655\/NCBI\/2001-10-15/Escherichia_coli_K_12_MG1655\/NCBI\/2013-09-26-Aaron/g' |  \
 	sed 's/Rhodobacter_sphaeroides_2.4.1\/NCBI\/2005-10-07/Rhodobacter_sphaeroides_2.4.1\/NCBI\/2012-06-25/g' | \
 	sed 's/,Escherichia_coli_K_12_MG1655/,\/illumina\/scratch\/Jigsaw\/genomes\/Escherichia_coli_K_12_MG1655/g' | \
 	sed 's/,Bacillus_cereus_ATCC_10987/,\/illumina\/scratch\/Jigsaw\/genomes\/Bacillus_cereus_ATCC_10987/g' | \
@@ -14,7 +14,8 @@ replace_genome_paths()
 	sed 's/,Saccharomyces_cerevisiae/,\/illumina\/scratch\/Jigsaw\/genomes\/Saccharomyces_cerevisiae/g' | \
 	sed 's/,Bordetella_pertussis_18323/,\/illumina\/scratch\/Jigsaw\/genomes\/Bordetella_pertussis_18323/g' | \
 	sed 's/,Mycobacterium_tuberculosis_H37Rv/,\/illumina\/scratch\/Jigsaw\/genomes\/Mycobacterium_tuberculosis_H37Rv/g' | \
-	sed 's/,Listeria_monocytogenes_EGD_e/,\/illumina\/scratch\/Jigsaw\/genomes\/Listeria_monocytogenes_EGD_e/g'
+	sed 's/,Listeria_monocytogenes_EGD_e/,\/illumina\/scratch\/Jigsaw\/genomes\/Listeria_monocytogenes_EGD_e/g' | \
+	sed 's/2013-09-26\//2013-09-26-Aaron\//g' 
 }
 
 rewrite_samplesheet_for_alignment()
