@@ -24,9 +24,6 @@ fi
 ASSEMBLY=$1
 GENOME=$2
 
-# dot plots
-$DIR/scripts/generate_plot "$GENOME" "$ASSEMBLY/scaffolds.fasta" "$OUT_DIR/dotplot.png"
-
 
 if ! [ -f "$ASSEMBLY/scaffolds.fasta" ]
 then
@@ -40,18 +37,31 @@ then
 	exit 1
 fi
 
+# dot plots
+export PATH=$MUMMER_DIR:$PATH
+TMPDIR=/tmp/plottmp.$$
+mkdir -p $TMPDIR
+pushd $TMPDIR
+# replace annoying node names in assembly
+sed 's/\(NODE_[0-9]*\)\(_.*\)/\1/g' "$ASSEMBLY/scaffolds.fasta" > assembly.fasta
+nucmer -mumreference -c 1000 -l 100 -banded -d 10 ${GENOME} assembly.fasta
+delta-filter -1 out.delta > out.1delta
+mummerplot -large -fat out.1delta --png
+cp out.png "$OUT_DIR/dotplot.png"
 
-shift 2
+# create a BED file showing coverage gaps
+show-tiling -V0 -v 20 out.1delta |awk '{if(substr($1,0,1)==">") CHR=substr($1,2); else if($3>0) print CHR"\t"$2"\t"$2+$3"\t0"}' > $OUT_DIR/gaps.bed
+popd
+rm -rf $TMPDIR
 
+
+# aligned scaffolds
 export PATH=$BWA_DIR:$SAMTOOLS_DIR:$PATH
 MYSCRATCH=$SCRATCH_DIR/bwa.$$
 mkdir -p $MYSCRATCH
-bwa bwasw -t 4  ${GENOME} $ASSEMBLY/scaffolds.fasta > $MYSCRATCH/scaffolds.sam
+bwa bwasw -t 4 -M ${GENOME} $ASSEMBLY/scaffolds.fasta > $MYSCRATCH/scaffolds.sam
 samtools view -bS $MYSCRATCH/scaffolds.sam > $MYSCRATCH/scaffolds.bam
 samtools sort $MYSCRATCH/scaffolds.bam $OUT_DIR/scaffolds
 samtools index $OUT_DIR/scaffolds.bam
-
-# create a BED file showing coverage gaps
-$BEDTOOLS_DIR/bedtools genomecov -ibam $OUT_DIR/scaffolds.bam -bga -split | grep -E ".*0$" > $OUT_DIR/gaps.bed
 
 rm -rf $MYSCRATCH
