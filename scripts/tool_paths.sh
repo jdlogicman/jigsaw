@@ -1,7 +1,6 @@
 #!/bin/bash
 
-SPADES_DIR=/illumina/thirdparty/spades/SPAdes-3.1.1-Linux/bin
-#SPADES_DIR=/illumina/thirdparty/spades/SPAdes-3.5.0-Linux/bin
+SPADES_DIR=/illumina/thirdparty/spades/SPAdes-3.5.0-Linux/bin
 FASTQ_TOOLKIT=/illumina/scratch/Jigsaw/tools/FastqToolkit/latest
 QUAST_DIR=/illumina/thirdparty/quast-2.3
 PYTHON_DIR=/illumina/thirdparty/python/python-2.7.8/bin
